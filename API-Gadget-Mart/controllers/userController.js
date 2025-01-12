@@ -8,7 +8,7 @@ const axios = require('axios');
 
 const redisClient = redis.createClient();
 
-// Registering the user
+// Registering the user with reCAPTCHA verification
 const createUser = async (req, res) => {
   // Log incoming data
   console.log(req.body);
