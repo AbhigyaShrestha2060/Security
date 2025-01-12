@@ -1,0 +1,479 @@
+.admin-dashboard {
+    min-height: 100vh;
+    background-color: #f0f2f5;
+    color: #333;
+    padding: 2rem;
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  header h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    color: #2c3e50;
+  }
+  
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+  }
+  
+  .sidebar, .main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .quick-stats, .category-distribution, .sales-trends, .gadget-inventory {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .quick-stats h2, .category-distribution h2, .sales-trends h2, .gadget-inventory h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+  }
+  
+  .quick-stats ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .quick-stats li {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+  }
+  
+  .stat-value {
+    font-weight: bold;
+    color: #3498db;
+  }
+  
+  .add-gadget-btn {
+    background-color: #3498db;
+    border: none;
+    color: #ffffff;
+    padding: 0.8rem;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+  }
+  
+  .add-gadget-btn:hover {
+    background-color: #2980b9;
+  }
+  
+  .search-bar {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    border-radius: 5px;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .search-bar input {
+    border: none;
+    margin-left: 0.5rem;
+    width: 100%;
+    font-size: 1rem;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    text-align: left;
+    padding: 0.8rem;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+    color: #2c3e50;
+  }
+  
+  .category-tag {
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    color: #ffffff;
+  }
+  
+  .category-tag.laptop { background-color: #3498db; }
+  .category-tag.accessories { background-color: #2ecc71; }
+  .category-tag.speaker { background-color: #f39c12; }
+  .category-tag.mobile { background-color: #e74c3c; }
+  
+  .edit-btn, .delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-right: 0.5rem;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+  }
+  
+  .edit-btn { color: #3498db; }
+  .edit-btn:hover { color: #2980b9; }
+  
+  .delete-btn { color: #e74c3c; }
+  .delete-btn:hover { color: #c0392b; }
+  
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal-content {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .modal-content h2 {
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #34495e;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 5px;
+    border: 1px solid #bdc3c7;
+    font-size: 1rem;
+  }
+  
+  .form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .cancel-btn, .submit-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+  }
+  
+  .cancel-btn {
+    background-color: #ecf0f1;
+    border: 1px solid #bdc3c7;
+    color: #34495e;
+  }
+  
+  .cancel-btn:hover {
+    background-color: #bdc3c7;
+  }
+  
+  .submit-btn {
+    background-color: #3498db;
+    border: none;
+    color: #ffffff;
+  }
+  
+  .submit-btn:hover {
+    background-color: #2980b9;
+  }
+  
+  @media (max-width: 768px) {
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .sidebar, .main-content {
+      gap: 1rem;
+    }
+    
+    header h1 {
+      font-size: 2rem;
+    }
+    
+    .quick-stats, .category-distribution, .sales-trends, .gadget-inventory {
+      padding: 1rem;
+    }
+    
+    .form-actions {
+      flex-direction: column;
+    }
+    
+    .cancel-btn, .submit-btn {
+      width: 100%;
+    }
+  }
+  
+  /* Recharts customization */
+  .recharts-wrapper {
+    font-size: 12px;
+  }
+  
+  .recharts-tooltip-wrapper {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+  }
+  
+  .recharts-default-tooltip {
+    background-color: transparent !important;
+    border: none !important;
+  }
+  
+  .recharts-tooltip-item {
+    color: #333 !important;
+  }
+  
+  .recharts-cartesian-axis-tick-value {
+    fill: #7f8c8d;
+  }
+  
+  .recharts-legend-item-text {
+    color: #34495e !important;
+  }
+
+  
+  .order-management {
+    margin-top: 2rem;
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .order-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+  
+  .order-card {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  .order-id {
+    font-weight: bold;
+  }
+  
+  .order-status {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  
+  .order-status.pending {
+    background-color: #ff6a00;
+    color: #000;
+  }
+  
+  .order-status.dispatched {
+    background-color: #d4d708;
+    color: #000;
+  }
+  
+  .order-status.delivered {
+    background-color: #4caf50;
+    color: #fff;
+  }
+  
+  .order-info p {
+    margin: 0.25rem 0;
+  }
+  
+  .order-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+  }
+  
+  .view-btn {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .status-select {
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  
+  /* Order Modal Styles */
+  .order-modal .modal-content {
+    max-width: 600px;
+  }
+  
+  .order-details p {
+    margin: 0.5rem 0;
+  }
+  
+  .ordered-items {
+    list-style-type: none;
+    padding-left: 0;
+  }
+  
+  .ordered-items li {
+    margin-bottom: 0.25rem;
+  }
+  
+  .close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .completed-orders {
+    margin-top: 20px;
+  }
+  
+  .completed-orders table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .completed-orders th,
+  .completed-orders td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .completed-orders th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+
+  /* Light mode styles (default) */
+.admin-dashboard {
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+/* Dark mode styles */
+.admin-dashboard.dark-mode {
+  background-color: #222;
+  color: #f4f4f4;
+}
+
+.dark-mode .sidebar,
+.dark-mode .main-content,
+.dark-mode .modal-content {
+  background-color: #333;
+}
+
+.dark-mode .gadget-inventory table {
+  background-color: #444;
+}
+
+.dark-mode .gadget-inventory th,
+.dark-mode .gadget-inventory td {
+  border-color: #555;
+}
+
+.dark-mode .order-card {
+  background-color: #444;
+}
+
+.dark-mode .search-bar input {
+  background-color: #555;
+  color: #f4f4f4;
+}
+
+.dark-mode .add-gadget-btn,
+.dark-mode .edit-btn,
+.dark-mode .delete-btn,
+.dark-mode .submit-btn {
+  background-color: #555;
+  color: #f4f4f4;
+}
+
+.dark-mode .cancel-btn {
+  background-color: #777;
+  color: #f4f4f4;
+}
+
+.dark-mode-toggle {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* Adjust chart colors for dark mode */
+.dark-mode .recharts-cartesian-grid-horizontal line,
+.dark-mode .recharts-cartesian-grid-vertical line {
+  stroke: #555;
+}
+
+.dark-mode .recharts-text {
+  fill: #f4f4f4;
+}

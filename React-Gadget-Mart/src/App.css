@@ -1,0 +1,120 @@
+
+
+.App-logo {
+    height: 4rem;
+}
+
+.navbar {
+    background-color: #09aec7a3;
+}
+
+.nav-link {
+    color: #050101;
+}
+
+
+.navbar-nav .nav-link.active,
+.navbar-nav .nav-link.show {
+    color: #9A93FF;
+}
+
+/* Hover nav */
+.navbar-nav .nav-link:hover {
+    color: #9A93FF;
+}
+
+/* Navbar button */
+.navbar-toggler-icon {
+    background-color: #FFFFFF;
+}
+
+.login-logo {
+    height: 75%;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-center {
+    text-align: center;
+}
+
+
+
+/* Footer*/
+
+.footer-logo {
+    height: 2.5rem;
+}
+
+.footer {
+    color: #714949 !important;
+}
+
+.footer a {
+    color: #714949 !important;
+    text-decoration: none;
+}
+
+.footer p {
+    cursor: default;
+}
+
+.footer span {
+    cursor: default;
+}
+
+
+/* Register.css */
+
+.custom-card {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+
+#map {
+    height: 180px;
+}
+
+
+.footer {
+    background-color: #f8f9fa;
+    padding: 20px 0;
+  }
+  
+  .footer h5 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  
+  .footer p {
+    margin-bottom: 0.5rem;
+  }
+  
+  .footer a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .footer a:hover {
+    text-decoration: underline;
+  }
+  
+  .footer .input-group {
+    max-width: 300px;
+  }
+  
+  .footer .input-group .form-control {
+    border-right: 0;
+  }
+  
+  .footer .input-group .btn {
+    border-left: 0;
+  }
+  
+  
+
