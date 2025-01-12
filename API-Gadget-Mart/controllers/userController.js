@@ -80,7 +80,7 @@ const createUser = async (req, res) => {
   }
 };
 
-// Logging in the user
+// Logging in the user with rate limiting and reCAPTCHA verification
 
 const loginUser = async (req, res) => {
   const { email, password, captchaToken } = req.body;
