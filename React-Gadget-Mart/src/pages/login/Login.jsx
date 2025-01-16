@@ -17,8 +17,6 @@ const { Title, Text, Paragraph } = Typography;
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_DURATION = 15 * 60 * 1000;
 
-// Front end validation
-
 const Login = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
