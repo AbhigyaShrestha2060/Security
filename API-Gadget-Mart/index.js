@@ -1,12 +1,15 @@
 // Importing required packages
-const express = require("express");
-const connectDatabase = require("./database/database");
-const dotenv = require("dotenv");
-const cors = require("cors");
-const acceptFormdata = require("express-fileupload");
-const cartRoutes = require("./routes/cartRoutes"); // Import cart routes
-const favouritesRoutes = require("./routes/favouritesRoutes"); // Import favourites routes
-const morgan = require("morgan");
+const express = require('express');
+const connectDatabase = require('./database/database');
+const dotenv = require('dotenv');
+const cors = require('cors');
+const acceptFormdata = require('express-fileupload');
+const cartRoutes = require('./routes/cartRoutes'); // Import cart routes
+const favouritesRoutes = require('./routes/favouritesRoutes'); // Import favourites routes
+const morgan = require('morgan');
+const logActivity = require('./middleware/LogActivity');
+const mongoSanitize = require('express-mongo-sanitize');
+const xssClean = require('xss-clean');
 
 // Load environment variables
 dotenv.config();
@@ -21,36 +24,45 @@ const corsOptions = {
   optionSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
-app.use(morgan("dev"));
+app.use(morgan('dev'));
 // Express JSON configuration
 app.use(express.json());
+
+// Data sanitization against NoSQL query injection
+app.use(mongoSanitize());
+
+// Data sanitization against XSS
+app.use(xssClean());
+
+// LogActivity
+app.use(logActivity.activityLoggerMiddleware);
 
 // Configure form data handling
 app.use(acceptFormdata());
 
 // Serve static files (optional)
-app.use(express.static("./public"));
+app.use(express.static('./public'));
 
 // Connect to database
 connectDatabase();
 
 // Define test endpoint
-app.get("/test", (req, res) => {
-  res.send("Test API is Working!...");
+app.get('/test', (req, res) => {
+  res.send('Test API is Working!...');
 });
 
 // Define routes
 // Use cartRoutes for /api/cart endpoints
-app.use("/api/cart", cartRoutes);
+app.use('/api/cart', cartRoutes);
 
 // Use favouritesRoutes for /api/favourites endpoints
-app.use("/api/favourite", favouritesRoutes);
+app.use('/api/favourite', favouritesRoutes);
 
 // Configure existing routes
-app.use("/api/user", require("./routes/userRoutes"));
-app.use("/api/product", require("./routes/productRoutes"));
-app.use("/api/order", require("./routes/orderRoutes"));
-
+app.use('/api/user', require('./routes/userRoutes'));
+app.use('/api/product', require('./routes/productRoutes'));
+app.use('/api/order', require('./routes/orderRoutes'));
+app.use('/api/logactivity', require('./routes/LogActivityRoutes'));
 // Define port
 const PORT = process.env.PORT || 5000;
 

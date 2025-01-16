@@ -6,19 +6,11 @@ import {
   LockOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import {
-  Alert,
-  Button,
-  Card,
-  Form,
-  Input,
-  Space,
-  Spin,
-  Typography,
-} from 'antd';
+import { Alert, Button, Card, Form, Input, Spin, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { loginUserApi, verifyMfaCodeApi } from '../../Apis/api'; // Ensure this import path is correct
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -35,6 +27,11 @@ const Login = () => {
   const [loginAttempts, setLoginAttempts] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   const [lockoutEndTime, setLockoutEndTime] = useState(null);
+
+  // MFA related states
+  const [isMfaRequired, setIsMfaRequired] = useState(false);
+  const [mfaType, setMfaType] = useState(''); // e.g., "email", "app"
+  const [mfaCode, setMfaCode] = useState('');
 
   useEffect(() => {
     const lockedUntil = localStorage.getItem('accountLockedUntil');
@@ -72,21 +69,6 @@ const Login = () => {
     return Promise.resolve();
   };
 
-  const validatePassword = (_, value) => {
-    if (!value) {
-      return Promise.reject('Please enter your password');
-    }
-    if (value.length < 8) {
-      return Promise.reject('Password must be at least 8 characters');
-    }
-    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/.test(value)) {
-      return Promise.reject(
-        'Password must contain lowercase, uppercase, number, and special character'
-      );
-    }
-    return Promise.resolve();
-  };
-
   const handleSubmit = async (values) => {
     if (isLocked) {
       setError('Account is temporarily locked. Please try again later.');
@@ -102,25 +84,21 @@ const Login = () => {
       setLoading(true);
       setError('');
 
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/auth/login`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: values.email,
-            password: values.password,
-            captchaToken,
-          }),
-          credentials: 'include',
+      const response = await loginUserApi({
+        email: values.email,
+        password: values.password,
+        captchaToken,
+      });
+
+      const { data } = response;
+
+      if (response.status === 200) {
+        if (data.mfaRequired) {
+          setIsMfaRequired(true);
+          setMfaType(data.mfaType);
+          return; // Don't continue yet, let the user input MFA code
         }
-      );
 
-      const data = await response.json();
-
-      if (response.ok) {
         const encodedToken = btoa(data.token);
         localStorage.setItem('token', encodedToken);
         setLoginAttempts(0);
@@ -131,7 +109,34 @@ const Login = () => {
         throw new Error(data.message || 'Invalid credentials');
       }
     } catch (err) {
-      setError(err.message || 'An error occurred during login');
+      setError(err.response?.data?.message || 'An error occurred during login');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMfaSubmit = async () => {
+    try {
+      setLoading(true);
+      setError('');
+
+      // Send the MFA code to the backend to verify
+      const response = await verifyMfaCodeApi({
+        email: form.getFieldValue('email'),
+        mfaCode: mfaCode,
+      });
+
+      const { data } = response;
+
+      if (response.status === 200) {
+        const encodedToken = btoa(data.token);
+        localStorage.setItem('token', encodedToken);
+        navigate(data.user.role === 'admin' ? '/admin/dashboard' : '/');
+      } else {
+        throw new Error(data.message || 'Invalid MFA code');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'MFA verification failed');
     } finally {
       setLoading(false);
     }
@@ -191,113 +196,127 @@ const Login = () => {
               />
             )}
 
-            <Form
-              form={form}
-              onFinish={handleSubmit}
-              layout='vertical'
-              requiredMark={false}
-              size='large'>
-              <Form.Item
-                name='email'
-                rules={[{ validator: validateEmail }]}>
-                <Input
-                  prefix={<UserOutlined className='text-gray-400' />}
-                  placeholder='Email'
-                  disabled={isLocked}
-                  autoComplete='email'
-                  className='rounded-lg'
-                  style={{ height: '3rem' }}
-                />
-              </Form.Item>
+            {/* Initial Login Form */}
+            {!isMfaRequired && (
+              <Form
+                form={form}
+                onFinish={handleSubmit}
+                layout='vertical'
+                requiredMark={false}
+                size='large'>
+                <Form.Item
+                  name='email'
+                  rules={[{ validator: validateEmail }]}>
+                  <Input
+                    prefix={<UserOutlined className='text-gray-400' />}
+                    placeholder='Email'
+                    disabled={isLocked}
+                    autoComplete='email'
+                    className='rounded-lg'
+                    style={{ height: '3rem' }}
+                  />
+                </Form.Item>
 
-              <Form.Item
-                name='password'
-                rules={[{ validator: validatePassword }]}>
-                <Input.Password
-                  prefix={<LockOutlined className='text-gray-400' />}
-                  placeholder='Password'
-                  disabled={isLocked}
-                  iconRender={(visible) =>
-                    visible ? (
-                      <EyeTwoTone className='text-gray-400' />
-                    ) : (
-                      <EyeInvisibleOutlined className='text-gray-400' />
-                    )
-                  }
-                  autoComplete='current-password'
-                  className='rounded-lg'
-                  style={{ height: '3rem' }}
-                />
-              </Form.Item>
+                <Form.Item name='password'>
+                  <Input.Password
+                    prefix={<LockOutlined className='text-gray-400' />}
+                    placeholder='Password'
+                    disabled={isLocked}
+                    iconRender={(visible) =>
+                      visible ? (
+                        <EyeTwoTone className='text-gray-400' />
+                      ) : (
+                        <EyeInvisibleOutlined className='text-gray-400' />
+                      )
+                    }
+                    autoComplete='current-password'
+                    className='rounded-lg'
+                    style={{ height: '3rem' }}
+                  />
+                </Form.Item>
 
-              <div className='flex justify-center mb-4'>
-                <ReCAPTCHA
-                  sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
-                  onChange={setCaptchaToken}
-                  theme='light'
-                />
-              </div>
+                <div className='flex justify-center mb-4'>
+                  <ReCAPTCHA
+                    sitekey='6LeqWbMqAAAAAJsPdQqXcEX6M-68zQNUex8sYCgA'
+                    onChange={setCaptchaToken}
+                    theme='light'
+                  />
+                </div>
 
-              <Form.Item>
+                <Form.Item>
+                  <Button
+                    type='primary'
+                    htmlType='submit'
+                    block
+                    disabled={isLocked || !captchaToken}
+                    className='h-12 rounded-lg'
+                    style={{
+                      background: 'linear-gradient(to right, #3b82f6, #8b5cf6)',
+                      border: 'none',
+                    }}>
+                    Log In
+                  </Button>
+                </Form.Item>
+
+                <div className='relative my-8'>
+                  <div className='absolute inset-0 flex items-center'>
+                    <div className='w-full border-t border-gray-200'></div>
+                  </div>
+                  <div className='relative flex justify-center text-sm'>
+                    <span className='px-4 bg-white text-gray-500'>
+                      Or continue with
+                    </span>
+                  </div>
+                </div>
+
                 <Button
-                  type='primary'
-                  htmlType='submit'
+                  icon={<GoogleOutlined />}
+                  type='default'
                   block
-                  disabled={isLocked || !captchaToken}
-                  className='h-12 rounded-lg'
-                  style={{
-                    background: 'linear-gradient(to right, #3b82f6, #8b5cf6)',
-                    border: 'none',
-                  }}>
-                  Log In
+                  size='large'
+                  className='!h-12 rounded-lg'>
+                  Google
                 </Button>
-              </Form.Item>
+              </Form>
+            )}
 
-              <div className='relative my-8'>
-                <div className='absolute inset-0 flex items-center'>
-                  <div className='w-full border-t border-gray-200'></div>
-                </div>
-                <div className='relative flex justify-center text-sm'>
-                  <span className='px-4 bg-white text-gray-500'>
-                    Or continue with
-                  </span>
-                </div>
-              </div>
+            {/* MFA Input Form */}
+            {isMfaRequired && (
+              <Form
+                form={form}
+                onFinish={handleMfaSubmit}
+                layout='vertical'
+                requiredMark={false}
+                size='large'>
+                <Form.Item
+                  name='mfaCode'
+                  rules={[
+                    { required: true, message: 'Please enter the MFA code' },
+                  ]}>
+                  <Input
+                    value={mfaCode}
+                    onChange={(e) => setMfaCode(e.target.value)}
+                    placeholder={`Enter the ${
+                      mfaType === 'email' ? 'email' : 'app'
+                    } code`}
+                    disabled={loading}
+                    className='rounded-lg'
+                    style={{ height: '3rem' }}
+                  />
+                </Form.Item>
 
-              <Button
-                icon={<GoogleOutlined />}
-                block
-                onClick={() => {
-                  window.location.href = `${process.env.REACT_APP_API_URL}/auth/google`;
-                }}
-                disabled={isLocked}
-                className='h-12 rounded-lg flex items-center justify-center'
-                style={{
-                  background: '#fff',
-                  border: '2px solid #e5e7eb',
-                }}>
-                <span className='ml-2'>Continue with Google</span>
-              </Button>
-
-              <Space
-                direction='vertical'
-                size='middle'
-                className='w-full text-center mt-6'>
-                <Link
-                  to='/forgot-password'
-                  className='text-blue-500 hover:text-blue-700 transition-colors'>
-                  Forgot password?
-                </Link>
-                <Text>
-                  Don't have an account?{' '}
-                  <Link
-                    to='/register'
-                    className='text-purple-500 hover:text-purple-700 transition-colors font-medium'>
-                    Sign up
-                  </Link>
-                </Text>
-              </Space>
-            </Form>
+                <Form.Item>
+                  <Button
+                    type='primary'
+                    htmlType='submit'
+                    block
+                    loading={loading}
+                    disabled={loading || !mfaCode}>
+                    Verify MFA Code
+                  </Button>
+                </Form.Item>
+              </Form>
+            )}
           </Spin>
         </Card>
       </div>

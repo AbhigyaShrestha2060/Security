@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema(
   {
@@ -19,9 +19,17 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    passwordHistory: {
+      type: [String], // Array of previous hashed passwords
+      default: [],
+    },
+    passwordLastUpdated: {
+      type: Date,
+      default: Date.now, // Set to current date by default
+    },
     role: {
       type: String,
-      default: "user",
+      default: 'user',
     },
     createdAt: {
       type: Date,
@@ -35,12 +43,28 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    googleOTP: {
+      type: String,
+      default: null,
+    },
+    googleOTPExpires: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-const userModel = mongoose.model("User", userSchema);
+// Pre-save hook to ensure only the last 5 passwords are stored
+userSchema.pre('save', function (next) {
+  if (this.passwordHistory.length > 5) {
+    this.passwordHistory = this.passwordHistory.slice(-5); // Keep only the last 5 entries
+  }
+  next();
+});
+
+const userModel = mongoose.model('User', userSchema);
 
 module.exports = userModel;

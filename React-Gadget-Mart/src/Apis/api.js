@@ -28,6 +28,8 @@ export const registerUserApi = (data) => Api.post('/api/user/create', data);
 // Login user
 export const loginUserApi = (data) => Api.post('/api/user/login', data);
 
+export const verifyMfaCodeApi = (data) => Api.post('/api/user/verifyOTP', data);
+
 // create product API
 export const createProductApi = (data) => Api.post('/api/product/create', data);
 
