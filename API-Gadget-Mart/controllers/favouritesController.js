@@ -1,11 +1,10 @@
 // controllers/favouritesController.js
 
-const Favourite = require("../models/favouritesModel");
+const Favourite = require('../models/favouritesModel');
 
 // Add item to favorites
 exports.favorite = async (req, res) => {
   try {
-    console.log(req.body);
     const userId = req.user.id;
 
     const { productId } = req.body;
@@ -13,7 +12,7 @@ exports.favorite = async (req, res) => {
     if (!productId) {
       return res
         .status(400)
-        .json({ success: false, message: "Product ID is required!" });
+        .json({ success: false, message: 'Product ID is required!' });
     }
 
     const existingFavorite = await Favourite.findOne({
@@ -24,7 +23,7 @@ exports.favorite = async (req, res) => {
     if (existingFavorite) {
       return res.status(400).json({
         success: false,
-        message: "Product already in favorites",
+        message: 'Product already in favorites',
       });
     }
 
@@ -35,9 +34,8 @@ exports.favorite = async (req, res) => {
 
     await newFavorite.save();
 
-    res.status(201).json({ success: true, message: "Favorite toggled" });
+    res.status(201).json({ success: true, message: 'Favorite toggled' });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -57,7 +55,7 @@ exports.getFavorite = async (req, res) => {
   try {
     const userId = req.user.id;
     const favoriteItems = await Favourite.find({ userId: userId }).populate(
-      "productId"
+      'productId'
     );
     res.status(200).json({
       success: true,
@@ -80,14 +78,14 @@ exports.deleteFavoriteItem = async (req, res) => {
     });
 
     if (!favoriteItem) {
-      return res.status(404).json({ message: "Item not found" });
+      return res.status(404).json({ message: 'Item not found' });
     }
 
     const favouriteId = favoriteItem._id;
 
     await Favourite.findByIdAndDelete(favouriteId);
 
-    res.status(201).json({ message: "Item deleted successfully" });
+    res.status(201).json({ message: 'Item deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -1,6 +1,6 @@
-import { motion } from "framer-motion";
-import React from "react";
-import { useForm } from "react-hook-form";
+import { motion } from 'framer-motion';
+import React from 'react';
+import { useForm } from 'react-hook-form';
 import {
   FaEnvelope,
   FaFacebookF,
@@ -9,8 +9,8 @@ import {
   FaMapMarkerAlt,
   FaPhone,
   FaTwitter,
-} from "react-icons/fa";
-import styled from "styled-components";
+} from 'react-icons/fa';
+import styled from 'styled-components';
 
 const ContactUs = () => {
   const {
@@ -33,15 +33,13 @@ const ContactUs = () => {
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
+            transition={{ duration: 0.5 }}>
             Get in Touch
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
+            transition={{ duration: 0.5, delay: 0.2 }}>
             We'd love to hear from you. Our team is always ready to assist!
           </motion.p>
           <ContactInfo>
@@ -59,16 +57,16 @@ const ContactUs = () => {
             </InfoItem>
           </ContactInfo>
           <SocialLinks>
-            <SocialIcon href="#">
+            <SocialIcon href='#'>
               <FaFacebookF />
             </SocialIcon>
-            <SocialIcon href="#">
+            <SocialIcon href='#'>
               <FaTwitter />
             </SocialIcon>
-            <SocialIcon href="#">
+            <SocialIcon href='#'>
               <FaLinkedinIn />
             </SocialIcon>
-            <SocialIcon href="#">
+            <SocialIcon href='#'>
               <FaInstagram />
             </SocialIcon>
           </SocialLinks>
@@ -77,8 +75,8 @@ const ContactUs = () => {
           <Form onSubmit={handleSubmit(onSubmit)}>
             <InputGroup>
               <Input
-                {...register("name", { required: "Name is required" })}
-                placeholder="Your Name"
+                {...register('name', { required: 'Name is required' })}
+                placeholder='Your Name'
               />
               {errors.name && (
                 <ErrorMessage>{errors.name.message}</ErrorMessage>
@@ -86,14 +84,14 @@ const ContactUs = () => {
             </InputGroup>
             <InputGroup>
               <Input
-                {...register("email", {
-                  required: "Email is required",
+                {...register('email', {
+                  required: 'Email is required',
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Invalid email address",
+                    message: 'Invalid email address',
                   },
                 })}
-                placeholder="Your Email"
+                placeholder='Your Email'
               />
               {errors.email && (
                 <ErrorMessage>{errors.email.message}</ErrorMessage>
@@ -101,8 +99,8 @@ const ContactUs = () => {
             </InputGroup>
             <InputGroup>
               <Input
-                {...register("subject", { required: "Subject is required" })}
-                placeholder="Subject"
+                {...register('subject', { required: 'Subject is required' })}
+                placeholder='Subject'
               />
               {errors.subject && (
                 <ErrorMessage>{errors.subject.message}</ErrorMessage>
@@ -110,18 +108,17 @@ const ContactUs = () => {
             </InputGroup>
             <InputGroup>
               <Textarea
-                {...register("message", { required: "Message is required" })}
-                placeholder="Your Message"
+                {...register('message', { required: 'Message is required' })}
+                placeholder='Your Message'
               />
               {errors.message && (
                 <ErrorMessage>{errors.message.message}</ErrorMessage>
               )}
             </InputGroup>
             <SubmitButton
-              type="submit"
+              type='submit'
               whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
+              whileTap={{ scale: 0.95 }}>
               Send Message
             </SubmitButton>
           </Form>
@@ -129,8 +126,8 @@ const ContactUs = () => {
       </ContentWrapper>
       <ImageSection>
         <img
-          src="https://images.unsplash.com/photo-1534536281715-e28d76689b4d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
-          alt="Contact Us"
+          src='https://images.unsplash.com/photo-1534536281715-e28d76689b4d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80'
+          alt='Contact Us'
         />
       </ImageSection>
     </Container>
@@ -141,7 +138,7 @@ const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 50px 20px;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
   background-color: #f9f9f9;
 `;
 

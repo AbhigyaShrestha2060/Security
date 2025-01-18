@@ -1,12 +1,9 @@
-const path = require("path");
-const productModel = require("../models/productModel");
-const Product = require("../models/productModel");
-const fs = require("fs");
+const path = require('path');
+const productModel = require('../models/productModel');
+const Product = require('../models/productModel');
+const fs = require('fs');
 
 const createProduct = async (req, res) => {
-  console.log(req.body);
-  console.log(req.files);
-
   const { productName, productPrice, productCategory, productDescription } =
     req.body;
 
@@ -18,14 +15,14 @@ const createProduct = async (req, res) => {
   ) {
     return res.status(400).json({
       success: false,
-      message: "Please enter all fields",
+      message: 'Please enter all fields',
     });
   }
 
   if (!req.files || !req.files.productImage) {
     return res.status(400).json({
       success: false,
-      message: "Image not found",
+      message: 'Image not found',
     });
   }
 
@@ -42,7 +39,7 @@ const createProduct = async (req, res) => {
 
     const newProduct = new productModel({
       productName,
-      productPrice: parseFloat(productPrice.replace(/,/g, "")),
+      productPrice: parseFloat(productPrice.replace(/,/g, '')),
       productCategory,
       productDescription,
       productImage: imageName,
@@ -51,14 +48,13 @@ const createProduct = async (req, res) => {
     const product = await newProduct.save();
     res.status(201).json({
       success: true,
-      message: "Product created successfully",
+      message: 'Product created successfully',
       data: product,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: 'Internal Server Error',
       error,
     });
   }
@@ -69,14 +65,13 @@ const getAllProducts = async (req, res) => {
     const allProducts = await productModel.find({});
     res.status(201).json({
       success: true,
-      message: "Products fetched successfully",
+      message: 'Products fetched successfully',
       products: allProducts,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: 'Internal Server Error',
       error,
     });
   }
@@ -84,17 +79,16 @@ const getAllProducts = async (req, res) => {
 
 const getALlCategories = async (req, res) => {
   try {
-    const allCategories = await productModel.find().distinct("productCategory");
+    const allCategories = await productModel.find().distinct('productCategory');
     res.status(201).json({
       success: true,
-      message: "Categories fetched successfully",
+      message: 'Categories fetched successfully',
       categories: allCategories,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: 'Internal Server Error',
       error,
     });
   }
@@ -108,19 +102,18 @@ const getSingleProduct = async (req, res) => {
     if (!product) {
       return res.status(400).json({
         success: false,
-        message: "No Product Found",
+        message: 'No Product Found',
       });
     }
     res.status(201).json({
       success: true,
-      message: "Product fetched",
+      message: 'Product fetched',
       product,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: 'Internal Server Error',
       error,
     });
   }
@@ -132,7 +125,7 @@ const deleteProduct = async (req, res) => {
     if (!product) {
       return res.status(400).json({
         success: false,
-        message: "Product not found",
+        message: 'Product not found',
       });
     }
 
@@ -147,13 +140,12 @@ const deleteProduct = async (req, res) => {
     await productModel.findByIdAndDelete(req.params.id);
     res.status(201).json({
       success: true,
-      message: "Product Deleted Successfully",
+      message: 'Product Deleted Successfully',
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: 'Internal Server Error',
       error,
     });
   }
@@ -183,7 +175,7 @@ const updateProduct = async (req, res) => {
       }
     }
 
-    req.body.productPrice = parseFloat(req.body.productPrice.replace(/,/g, ""));
+    req.body.productPrice = parseFloat(req.body.productPrice.replace(/,/g, ''));
 
     const updatedProduct = await productModel.findByIdAndUpdate(
       req.params.id,
@@ -192,14 +184,13 @@ const updateProduct = async (req, res) => {
     );
     res.status(201).json({
       success: true,
-      message: "Product updated!",
+      message: 'Product updated!',
       product: updatedProduct,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: 'Internal Server Error',
       error,
     });
   }
@@ -217,20 +208,19 @@ const paginationProducts = async (req, res) => {
     if (products.length === 0) {
       return res.status(400).json({
         success: false,
-        message: "No more products",
+        message: 'No more products',
       });
     }
 
     res.status(201).json({
       success: true,
-      message: "Products fetched successfully",
+      message: 'Products fetched successfully',
       products,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: 'Internal Server Error',
       error,
     });
   }
@@ -241,14 +231,13 @@ const getTotalProducts = async (req, res) => {
     const totalProducts = await Product.find({}).countDocuments();
     res.status(200).json({
       success: true,
-      message: "Total Products",
+      message: 'Total Products',
       count: totalProducts,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: 'Internal Server Error',
       error,
     });
   }

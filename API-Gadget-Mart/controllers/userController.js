@@ -184,10 +184,10 @@ const loginUser = async (req, res) => {
     const otpExpiration = new Date();
     otpExpiration.setMinutes(otpExpiration.getMinutes() + 5); // OTP expires in 5 minutes
 
-    await userModel.findByIdAndUpdate(user._id, {
-      googleOTP: otp,
-      googleOTPExpires: otpExpiration,
-    });
+    user.googleOTP = otp;
+    user.googleOTPExpires = otpExpiration;
+
+    await user.save();
 
     // Send OTP via email
     const transporter = nodemailer.createTransport({
@@ -277,10 +277,7 @@ const verifyOTP = async (req, res) => {
     }
 
     // OTP is valid, generate JWT token
-    const token = jwt.sign(
-      { id: user._id, isAdmin: user.role === 'admin' },
-      process.env.JWT_SECRET
-    );
+    const token = jwt.sign({ id: userId }, process.env.JWT_SECRET);
 
     // Clear the used OTP
     await userModel.findByIdAndUpdate(userId, {
@@ -306,8 +303,6 @@ const verifyOTP = async (req, res) => {
 
 // forgot password by using phone number
 const forgetPassword = async (req, res) => {
-  console.log(req.body);
-
   const { phoneNumber } = req.body;
 
   if (!phoneNumber) {
@@ -326,7 +321,6 @@ const forgetPassword = async (req, res) => {
     }
     // Generate OTP
     const randomOTP = Math.floor(100000 + Math.random() * 900000);
-    console.log(randomOTP);
 
     user.resetPasswordOTP = randomOTP;
     user.resetPasswordExpires = Date.now() + 600000; // 10 minutes
@@ -337,7 +331,6 @@ const forgetPassword = async (req, res) => {
       message: 'OTP sent to your phone number',
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       success: false,
       message: 'Internal server error',
@@ -439,7 +432,6 @@ const getSingleUser = async (req, res) => {
       user: user,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       success: false,
       message: 'Internal server error',
@@ -458,7 +450,6 @@ const getAllUser = async (req, res) => {
       users: allUsers,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       success: false,
       message: 'Internal server error',
@@ -500,7 +491,6 @@ const updateProfile = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       success: false,
       message: 'Internal server error',
@@ -528,7 +518,6 @@ const getToken = async (req, res) => {
       token: token,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       success: false,
       message: 'Internal server error',

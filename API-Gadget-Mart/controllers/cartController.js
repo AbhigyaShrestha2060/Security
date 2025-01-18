@@ -1,20 +1,20 @@
 // controllers/cartController.js
-const path = require("path");
-const Cart = require("../models/cartModel");
+const path = require('path');
+const Cart = require('../models/cartModel');
 
 exports.addToCart = async (req, res) => {
   const { productId, quantity, total } = req.body;
   const id = req.user.id;
 
   if (!productId || !quantity || !total) {
-    return res.status(400).json({ message: "Please enter all fields" });
+    return res.status(400).json({ message: 'Please enter all fields' });
   }
 
   try {
     const itemInCart = await Cart.findOne({
       productId: productId,
       userId: id,
-      status: "active",
+      status: 'active',
     });
 
     if (itemInCart) {
@@ -23,7 +23,7 @@ exports.addToCart = async (req, res) => {
       await itemInCart.save();
       return res
         .status(200)
-        .json({ message: "Item quantity updated", cartItem: itemInCart });
+        .json({ message: 'Item quantity updated', cartItem: itemInCart });
     }
 
     const cartItem = new Cart({
@@ -34,7 +34,7 @@ exports.addToCart = async (req, res) => {
     });
 
     await cartItem.save();
-    res.status(200).json({ message: "Item added to cart", cartItem });
+    res.status(200).json({ message: 'Item added to cart', cartItem });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -47,10 +47,11 @@ exports.getAllCartItems = async (req, res) => {
     //  join cart with products
     const cartItems = await Cart.find({
       userId: id,
-      status: "active",
-    }).populate("productId");
-    console.log(cartItems);
-    res.status(200).json({ carts: cartItems , message: "Cart items fetched successfully" });
+      status: 'active',
+    }).populate('productId');
+    res
+      .status(200)
+      .json({ carts: cartItems, message: 'Cart items fetched successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -59,11 +60,9 @@ exports.getAllCartItems = async (req, res) => {
 // Delete item from cart
 exports.deleteCartItem = async (req, res) => {
   try {
-    console.log(req.params);
     const { id } = req.params;
-    console.log(req.params);
     await Cart.findByIdAndDelete(id);
-    res.json({ message: "Item deleted successfully" });
+    res.json({ message: 'Item deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -77,22 +76,21 @@ exports.updateCartItem = async (req, res) => {
 
     // Convert quantity to a number if it's provided as a string
     quantity = Number(quantity);
-    console.log(typeof quantity);
     // Validate quantity here if needed
     if (isNaN(quantity) || quantity <= 0) {
       return res
         .status(400)
-        .json({ error: "Quantity must be a valid number greater than zero" });
+        .json({ error: 'Quantity must be a valid number greater than zero' });
     }
 
     // Update the cart item based on id
     await Cart.findByIdAndUpdate(id, { quantity, total });
 
     // Respond with success message
-    res.status(200).json({ message: "Item updated successfully" });
+    res.status(200).json({ message: 'Item updated successfully' });
   } catch (error) {
     // Handle errors
-    console.error("Error updating cart item:", error);
+    console.error('Error updating cart item:', error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -105,7 +103,7 @@ exports.updateUserCartStatus = async (req, res) => {
     const cartItems = await Cart.updateMany({ userId: id }, { status: status });
     res
       .status(200)
-      .json({ message: "Cart status updated successfully", cartItems });
+      .json({ message: 'Cart status updated successfully', cartItems });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

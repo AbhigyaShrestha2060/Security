@@ -64,11 +64,11 @@ app.use('/api/product', require('./routes/productRoutes'));
 app.use('/api/order', require('./routes/orderRoutes'));
 app.use('/api/logactivity', require('./routes/LogActivityRoutes'));
 // Define port
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5500;
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}!`);
+  console.log(`Server is started`);
 });
 
 module.exports = app;

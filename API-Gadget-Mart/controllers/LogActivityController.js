@@ -8,7 +8,9 @@ export const getAllActivities = async (req, res) => {
     const ipAddress = req.headers['x-forwarded-for'] || req.ip;
 
     // Fetch all activity records, sorted by timestamp in descending order (latest first)
-    const activities = await Activity.find().sort({ timestamp: -1 });
+    const activities = await Activity.find()
+      .sort({ timestamp: -1 })
+      .populate('userId', 'email fullname');
 
     // Format the timestamp of each activity
     const formattedActivities = activities.map((activity) => {

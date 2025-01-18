@@ -1,14 +1,12 @@
 const {
   initializeKhaltiPayment,
   verifyKhaltiPayment,
-} = require("../service/khaltiService");
-const Payment = require("../models/paymentModel");
-const OrderModel = require("../models/orderModel");
+} = require('../service/khaltiService');
+const Payment = require('../models/paymentModel');
+const OrderModel = require('../models/orderModel');
 
 // Route to initialize Khalti payment gateway
 const initializePayment = async (req, res) => {
-  console.log(req.body);
-
   try {
     const { orderId, totalPrice, website_url } = req.body;
 
@@ -17,40 +15,39 @@ const initializePayment = async (req, res) => {
       _id: orderId,
       totalPrice: Number(totalPrice),
     })
-      .populate("carts")
+      .populate('carts')
       .populate({
-        path: "carts",
+        path: 'carts',
         populate: {
-          path: "productId",
-          model: "product",
+          path: 'productId',
+          model: 'product',
         },
       });
 
     if (!itemData) {
       return res.send({
         success: false,
-        message: "Order not found",
+        message: 'Order not found',
       });
     }
-    console.log(itemData.carts);
     // Extract product names from populated products array
     const productNames = itemData.carts
       .map((p) => p.productId.productName)
-      .join(", ");
+      .join(', ');
 
     if (!productNames) {
       return res.send({
         success: false,
-        message: "No product names found",
+        message: 'No product names found',
       });
     }
 
     // Create a payment document without transactionId initially
     const OrderModelData = await Payment.create({
       orderId: orderId,
-      paymentGateway: "khalti",
+      paymentGateway: 'khalti',
       amount: totalPrice,
-      status: "pending", // Set the initial status to pending
+      status: 'pending', // Set the initial status to pending
     });
 
     // Initialize the Khalti payment
@@ -59,7 +56,7 @@ const initializePayment = async (req, res) => {
       purchase_order_id: OrderModelData._id, // purchase_order_id because we need to verify it later
       purchase_order_name: productNames,
       return_url: `${process.env.BACKEND_URI}/api/khalti/complete-khalti-payment`,
-      website_url: website_url || "http://localhost:3000",
+      website_url: website_url || 'http://localhost:3000',
     });
 
     // Update the payment record with the transactionId and pidx
@@ -82,7 +79,7 @@ const initializePayment = async (req, res) => {
   } catch (error) {
     res.json({
       success: false,
-      error: error.message || "An error occurred",
+      error: error.message || 'An error occurred',
     });
   }
 };
@@ -96,13 +93,13 @@ const completeKhaltiPayment = async (req, res) => {
 
     // Validate the payment info
     if (
-      paymentInfo?.status !== "Completed" || // Ensure the status is "Completed"
+      paymentInfo?.status !== 'Completed' || // Ensure the status is "Completed"
       paymentInfo.pidx !== pidx || // Verify pidx matches
       Number(paymentInfo.total_amount) !== Number(amount) // Compare the total amount
     ) {
       return res.status(400).json({
         success: false,
-        message: "Incomplete or invalid payment information",
+        message: 'Incomplete or invalid payment information',
         paymentInfo,
       });
     }
@@ -139,7 +136,7 @@ const completeKhaltiPayment = async (req, res) => {
           transactionId: paymentInfo.transaction_id,
           // dataFromVerificationReq: paymentInfo,
           // apiQueryFromUser: req.query,
-          status: "success",
+          status: 'success',
         },
       },
       { new: true }
@@ -153,11 +150,11 @@ const completeKhaltiPayment = async (req, res) => {
     //   paymentData,
     // });
   } catch (error) {
-    console.error("Error verifying payment:", error);
+    console.error('Error verifying payment:', error);
     res.status(500).json({
       success: false,
-      message: "An error occurred during payment verification",
-      error: error.message || "An unknown error occurred",
+      message: 'An error occurred during payment verification',
+      error: error.message || 'An unknown error occurred',
     });
   }
 };

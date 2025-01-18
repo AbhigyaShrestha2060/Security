@@ -1,7 +1,6 @@
-const orderModel = require("../models/orderModel");
+const orderModel = require('../models/orderModel');
 
 exports.addOrder = async (req, res) => {
-  console.log(req.body);
   const { carts, address, total, paymentType, totalAmount } = req.body;
 
   try {
@@ -17,7 +16,6 @@ exports.addOrder = async (req, res) => {
 
     res.status(200).json({ success: true, order });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -26,8 +24,8 @@ exports.getAllOrders = async (req, res) => {
   try {
     const orders = await orderModel
       .find({})
-      .populate("carts")
-      .populate("userId")
+      .populate('carts')
+      .populate('userId')
       .sort({ createdAt: -1, status: 1 });
     res.json({
       success: true,
@@ -42,12 +40,12 @@ exports.getUserOrders = async (req, res) => {
   try {
     const orders = await orderModel
       .find({ userId: req.user.id })
-      .populate("carts")
+      .populate('carts')
       .populate({
-        path: "carts",
+        path: 'carts',
         populate: {
-          path: "productId",
-          model: "products",
+          path: 'productId',
+          model: 'products',
         },
       })
       .sort({ createdAt: -1 });
@@ -67,12 +65,12 @@ exports.updateOrderStatus = async (req, res) => {
   try {
     const order = await orderModel.findById(id);
     if (!order) {
-      return res.status(404).json({ message: "Order not found" });
+      return res.status(404).json({ message: 'Order not found' });
     }
 
     await orderModel.findByIdAndUpdate(id, { status });
 
-    res.status(200).json({ success: true, message: "Order status updated" });
+    res.status(200).json({ success: true, message: 'Order status updated' });
   } catch (e) {
     res.status(500).json({ error: error.message });
   }
