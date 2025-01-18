@@ -11,7 +11,6 @@ const UpdateProduct = () => {
   useEffect(() => {
     getSingleProductApi(id)
       .then((res) => {
-        console.log(res.data);
 
         //res -> data(message, success, product(pn,pp,pc) )
         //res.data.product.productName
@@ -22,7 +21,6 @@ const UpdateProduct = () => {
         setOldImage(res.data.product.productImage);
       })
       .catch((error) => {
-        console.log(error);
       });
   }, {});
 

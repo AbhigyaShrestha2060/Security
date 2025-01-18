@@ -18,9 +18,7 @@ const sendOtp = async (phone, otp) => {
     if (res.status === 200) {
       isSent = true;
     }
-  } catch (error) {
-    console.log('Error Sending OTP', error.message);
-  }
+  } catch (error) {}
   return isSent;
 };
 

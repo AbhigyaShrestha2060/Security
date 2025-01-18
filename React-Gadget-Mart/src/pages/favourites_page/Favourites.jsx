@@ -1,9 +1,9 @@
-import { DeleteOutlined, HeartOutlined } from "@ant-design/icons";
-import { Button, Image, message, Skeleton } from "antd";
-import { AnimatePresence, motion } from "framer-motion";
-import React, { useEffect, useState } from "react";
-import styled from "styled-components";
-import { deleteFromFavoriteApi, getFavoriteByUserApi } from "../../Apis/api";
+import { DeleteOutlined, HeartOutlined } from '@ant-design/icons';
+import { Button, Image, message, Skeleton } from 'antd';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { deleteFromFavoriteApi, getFavoriteByUserApi } from '../../Apis/api';
 
 const FavouritesContainer = styled(motion.div)`
   max-width: 1200px;
@@ -64,12 +64,11 @@ const Favourites = () => {
   const fetchFavorites = () => {
     getFavoriteByUserApi()
       .then((res) => {
-        console.log(res.data.favorites);
         setFavouriteItems(res.data.favorites);
         setLoading(false);
       })
       .catch((err) => {
-        message.error(err.response?.data?.message || "Something went wrong");
+        message.error(err.response?.data?.message || 'Something went wrong');
       });
   };
 
@@ -77,10 +76,10 @@ const Favourites = () => {
     deleteFromFavoriteApi(favouriteId) // Using deleteCartApi as a placeholder
       .then(() => {
         setChangeFav(!changefav);
-        message.success("Item removed from favourites");
+        message.success('Item removed from favourites');
       })
       .catch((err) => {
-        message.error(err.response?.data?.message || "Something went wrong");
+        message.error(err.response?.data?.message || 'Something went wrong');
       });
   };
 
@@ -88,7 +87,12 @@ const Favourites = () => {
     return (
       <FavouritesContainer>
         {[...Array(3)].map((_, index) => (
-          <Skeleton key={index} active avatar paragraph={{ rows: 3 }} />
+          <Skeleton
+            key={index}
+            active
+            avatar
+            paragraph={{ rows: 3 }}
+          />
         ))}
       </FavouritesContainer>
     );
@@ -98,8 +102,7 @@ const Favourites = () => {
     <FavouritesContainer
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
+      transition={{ duration: 0.5 }}>
       <h2>
         <HeartOutlined /> Your Favourites
       </h2>
@@ -111,8 +114,7 @@ const Favourites = () => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
+              transition={{ duration: 0.5, delay: index * 0.1 }}>
               <Image
                 width={150}
                 src={`http://localhost:5000/products/${item.productId.productImage}`}
@@ -127,18 +129,17 @@ const Favourites = () => {
                 <p>{item.productDescription}</p>
               </ItemDetails>
               <Button
-                type="primary"
+                type='primary'
                 danger
                 icon={<DeleteOutlined />}
-                onClick={() => handleDeleteFavourite(item.productId._id)}
-              >
+                onClick={() => handleDeleteFavourite(item.productId._id)}>
                 Remove
               </Button>
             </FavouriteItem>
           ))
         ) : (
           <EmptyFavouritesMessage>
-            <HeartOutlined style={{ fontSize: 50, marginBottom: "1rem" }} />
+            <HeartOutlined style={{ fontSize: 50, marginBottom: '1rem' }} />
             <p>Your favourites list is empty. Start adding items now!</p>
           </EmptyFavouritesMessage>
         )}

@@ -1,13 +1,13 @@
-import React, { useState } from "react";
 import {
   EyeOutlined,
   HeartOutlined,
   ShoppingCartOutlined,
-} from "@ant-design/icons";
-import { Button, Card, Form, Image, Input, Modal, Radio, Tooltip } from "antd";
-import { toast } from "react-toastify";
-import styled from "styled-components";
-import { addToFavoriteApi } from "../Apis/api";
+} from '@ant-design/icons';
+import { Button, Card, Form, Image, Input, Modal, Radio, Tooltip } from 'antd';
+import React, { useState } from 'react';
+import { toast } from 'react-toastify';
+import styled from 'styled-components';
+import { addToFavoriteApi } from '../Apis/api';
 
 // ... (keep all the styled components as they were)
 const StyledCard = styled(Card)`
@@ -65,8 +65,8 @@ const ProductCard = ({ productInformation, viewMode, addToCart, cartItem }) => {
   const [show, setShow] = useState(false);
   const [buyNowShow, setBuyNowShow] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const [address, setAddress] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("");
+  const [address, setAddress] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('');
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -74,42 +74,42 @@ const ProductCard = ({ productInformation, viewMode, addToCart, cartItem }) => {
   const handleBuyNowClose = () => setBuyNowShow(false);
   const handleBuyNowShow = () => {
     setQuantity(1);
-    setAddress("");
-    setPaymentMethod("");
+    setAddress('');
+    setPaymentMethod('');
     setBuyNowShow(true);
   };
 
   const handleAddToCart = async (product) => {
     try {
       await addToCart(product);
-      toast.success("Added to cart successfully");
+      toast.success('Added to cart successfully');
     } catch (error) {
-      toast.error("Error adding to cart");
+      toast.error('Error adding to cart');
     }
   };
 
   const addToFavourites = async (product) => {
     try {
       await addToFavoriteApi({ productId: product._id });
-      toast.success("Added to favourites successfully");
+      toast.success('Added to favourites successfully');
     } catch (error) {
-      toast.error("Error adding to favourites");
+      toast.error('Error adding to favourites');
     }
   };
 
   const placeOrder = () => {
     if (!address || !paymentMethod) {
-      toast.error("All fields are required");
+      toast.error('All fields are required');
       return;
     }
 
-    console.log("Order placed", {
+    console.log('Order placed', {
       product: productInformation,
       quantity,
       address,
       paymentMethod,
     });
-    toast.success("Order Successful");
+    toast.success('Order Successful');
     handleBuyNowClose();
   };
 
@@ -127,22 +127,24 @@ const ProductCard = ({ productInformation, viewMode, addToCart, cartItem }) => {
         <h3>{productInformation.productName}</h3>
         <PriceTag>Rs {productInformation.productPrice}</PriceTag>
         <ActionButtons>
-          <Tooltip title="Add to Cart">
+          <Tooltip title='Add to Cart'>
             <Button
               icon={<ShoppingCartOutlined />}
-              onClick={() => handleAddToCart(productInformation)}
-            >
+              onClick={() => handleAddToCart(productInformation)}>
               Add to Cart
             </Button>
           </Tooltip>
-          <Tooltip title="Add to Favorites">
+          <Tooltip title='Add to Favorites'>
             <Button
               icon={<HeartOutlined />}
               onClick={() => addToFavourites(productInformation)}
             />
           </Tooltip>
-          <Tooltip title="View Details">
-            <Button icon={<EyeOutlined />} onClick={handleShow} />
+          <Tooltip title='View Details'>
+            <Button
+              icon={<EyeOutlined />}
+              onClick={handleShow}
+            />
           </Tooltip>
         </ActionButtons>
       </ProductInfo>
@@ -151,13 +153,15 @@ const ProductCard = ({ productInformation, viewMode, addToCart, cartItem }) => {
 
   return (
     <>
-      {viewMode === "grid" ? (
-        <StyledCard hoverable cover={null}>
+      {viewMode === 'grid' ? (
+        <StyledCard
+          hoverable
+          cover={null}>
           {cardContent}
         </StyledCard>
       ) : (
-        <Card style={{ width: "100%", marginBottom: "16px" }}>
-          <div style={{ display: "flex" }}>
+        <Card style={{ width: '100%', marginBottom: '16px' }}>
+          <div style={{ display: 'flex' }}>
             <ListViewProductImage
               src={`http://localhost:5000/products/${productInformation.productImage}`}
               alt={productInformation.productName}
@@ -167,10 +171,9 @@ const ProductCard = ({ productInformation, viewMode, addToCart, cartItem }) => {
             <div
               style={{
                 flex: 1,
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
+                display: 'flex',
+                flexDirection: 'column',
+              }}>
               {cardContent}
             </div>
           </div>
@@ -182,60 +185,67 @@ const ProductCard = ({ productInformation, viewMode, addToCart, cartItem }) => {
         visible={show}
         onCancel={handleClose}
         footer={[
-          <Button key="close" onClick={handleClose}>
+          <Button
+            key='close'
+            onClick={handleClose}>
             Close
           </Button>,
           <Button
-            key="addToCart"
-            type="primary"
+            key='addToCart'
+            type='primary'
             onClick={() => {
               handleAddToCart(productInformation);
               handleClose();
-            }}
-          >
+            }}>
             Add to Cart
           </Button>,
           <Button
-            key="addToFavorites"
+            key='addToFavorites'
             onClick={() => {
               addToFavourites(productInformation);
               handleClose();
-            }}
-          >
+            }}>
             Add to Favorites
           </Button>,
-          <Button key="buyNow" type="primary" danger onClick={handleBuyNowShow}>
+          <Button
+            key='buyNow'
+            type='primary'
+            danger
+            onClick={handleBuyNowShow}>
             Buy Now
           </Button>,
-        ]}
-      >
+        ]}>
         <Image
           src={`http://localhost:5000/products/${productInformation.productImage}`}
           alt={productInformation.productName}
-          style={{ width: "100%", marginBottom: "16px" }}
+          style={{ width: '100%', marginBottom: '16px' }}
         />
         <p>{productInformation.productDescription}</p>
         <PriceTag>Rs {productInformation.productPrice}</PriceTag>
       </StyledModal>
 
       <StyledModal
-        title="Buy Now"
+        title='Buy Now'
         visible={buyNowShow}
         onCancel={handleBuyNowClose}
         footer={[
-          <Button key="close" onClick={handleBuyNowClose}>
+          <Button
+            key='close'
+            onClick={handleBuyNowClose}>
             Close
           </Button>,
-          <Button key="placeOrder" type="primary" onClick={placeOrder}>
+          <Button
+            key='placeOrder'
+            type='primary'
+            onClick={placeOrder}>
             Place Order
           </Button>,
-        ]}
-      >
-        <div style={{ display: "flex", marginBottom: "16px" }}>
+        ]}>
+        <div style={{ display: 'flex', marginBottom: '16px' }}>
           <Image
             src={`http://localhost:5000/products/${productInformation.productImage}`}
             alt={productInformation.productName}
-            style={{ width: "100px", height: "100px", marginRight: "16px" }}
+            style={{ width: '100px', height: '100px', marginRight: '16px' }}
           />
           <div>
             <h4>{productInformation.productName}</h4>
@@ -243,43 +253,46 @@ const ProductCard = ({ productInformation, viewMode, addToCart, cartItem }) => {
             <PriceTag>Rs {productInformation.productPrice} per unit</PriceTag>
           </div>
         </div>
-        <Form layout="vertical">
-          <Form.Item label="Quantity">
+        <Form layout='vertical'>
+          <Form.Item label='Quantity'>
             <Input
-              type="number"
+              type='number'
               min={1}
               value={quantity}
               onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
             />
           </Form.Item>
-          <Form.Item label="Total Price">
+          <Form.Item label='Total Price'>
             <PriceTag>Rs {totalPrice}</PriceTag>
           </Form.Item>
-          <Form.Item label="Address" required>
+          <Form.Item
+            label='Address'
+            required>
             <Input.TextArea
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              placeholder="Enter your address"
+              placeholder='Enter your address'
             />
           </Form.Item>
-          <Form.Item label="Payment Method" required>
+          <Form.Item
+            label='Payment Method'
+            required>
             <Radio.Group
               value={paymentMethod}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-            >
-              <Radio value="Khalti">
+              onChange={(e) => setPaymentMethod(e.target.value)}>
+              <Radio value='Khalti'>
                 <img
-                  src="assets/icons/khalti.png"
-                  alt="Khalti"
-                  style={{ width: "40px", height: "40px", marginRight: "8px" }}
+                  src='assets/icons/khalti.png'
+                  alt='Khalti'
+                  style={{ width: '40px', height: '40px', marginRight: '8px' }}
                 />
                 Khalti
               </Radio>
-              <Radio value="COD">
+              <Radio value='COD'>
                 <img
-                  src="assets/icons/cod.png"
-                  alt="Cash on Delivery"
-                  style={{ width: "40px", height: "40px", marginRight: "8px" }}
+                  src='assets/icons/cod.png'
+                  alt='Cash on Delivery'
+                  style={{ width: '40px', height: '40px', marginRight: '8px' }}
                 />
                 Cash on Delivery
               </Radio>

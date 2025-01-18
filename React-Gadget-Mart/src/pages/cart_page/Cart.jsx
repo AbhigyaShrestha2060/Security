@@ -4,20 +4,20 @@ import {
   MinusOutlined,
   PlusOutlined,
   ShoppingCartOutlined,
-} from "@ant-design/icons";
-import { Button, Image, Input, message, Radio, Skeleton } from "antd";
-import { AnimatePresence, motion } from "framer-motion";
-import KhaltiCheckout from "khalti-checkout-web";
-import React, { useEffect, useState } from "react";
-import styled from "styled-components";
-import { CountUp } from "use-count-up";
+} from '@ant-design/icons';
+import { Button, Image, Input, message, Radio, Skeleton } from 'antd';
+import { AnimatePresence, motion } from 'framer-motion';
+import KhaltiCheckout from 'khalti-checkout-web';
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { CountUp } from 'use-count-up';
 import {
   createOrderApi,
   deleteCartApi,
   getAllCartApi,
   updateCartApi,
   updateCartStatusApi,
-} from "../../Apis/api";
+} from '../../Apis/api';
 
 const CartContainer = styled(motion.div)`
   display: flex;
@@ -120,8 +120,8 @@ const EmptyCartMessage = styled.div`
 `;
 
 const Cart = () => {
-  const [address, setAddress] = useState("KTM");
-  const [paymentMethod, setPaymentMethod] = useState("Cash On Delivery");
+  const [address, setAddress] = useState('KTM');
+  const [paymentMethod, setPaymentMethod] = useState('Cash On Delivery');
   const [total, setTotal] = useState(0);
   const [subTotal, setSubTotal] = useState(0);
   const [deliveryCharge, setDeliveryCharge] = useState(50);
@@ -150,10 +150,10 @@ const Cart = () => {
 
     updateCartApi(cart._id, data)
       .then(() => {
-        message.success("Cart updated successfully");
+        message.success('Cart updated successfully');
       })
       .catch((err) => {
-        message.error(err.response?.data?.message || "Something went wrong");
+        message.error(err.response?.data?.message || 'Something went wrong');
       });
   };
 
@@ -161,10 +161,10 @@ const Cart = () => {
     deleteCartApi(cartId)
       .then(() => {
         setCartItems(cartItems.filter((item) => item._id !== cartId));
-        message.success("Item deleted successfully");
+        message.success('Item deleted successfully');
       })
       .catch((err) => {
-        message.error(err.response?.data?.message || "Something went wrong");
+        message.error(err.response?.data?.message || 'Something went wrong');
       });
   };
 
@@ -175,7 +175,6 @@ const Cart = () => {
         setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
         setLoading(false);
       });
   }, [change]);
@@ -187,36 +186,32 @@ const Cart = () => {
   }, [cartItems, deliveryCharge, change]);
 
   const khaltiConfig = {
-    publicKey: "test_public_key_0800545e039d45368cab4d1b2fb93d01",
-    productIdentity: "1234567890",
-    productName: "Cart Items",
-    productUrl: "http://localhost:3000/cart",
+    publicKey: 'test_public_key_0800545e039d45368cab4d1b2fb93d01',
+    productIdentity: '1234567890',
+    productName: 'Cart Items',
+    productUrl: 'http://localhost:3000/cart',
     paymentPreference: [
-      "KHALTI",
-      "EBANKING",
-      "MOBILE_BANKING",
-      "CONNECT_IPS",
-      "SCT",
+      'KHALTI',
+      'EBANKING',
+      'MOBILE_BANKING',
+      'CONNECT_IPS',
+      'SCT',
     ],
     eventHandler: {
       onSuccess(payload) {
-        console.log(payload);
         handlePayment();
-        message.success("Payment successful");
+        message.success('Payment successful');
       },
       onError(error) {
-        console.log(error);
-        message.error("Payment failed");
+        message.error('Payment failed');
       },
-      onClose() {
-        console.log("widget is closing");
-      },
+      onClose() {},
     },
   };
 
   const handleKhaltiPayment = () => {
     if (!address.trim()) {
-      message.error("Please enter your address");
+      message.error('Please enter your address');
       return;
     }
     const checkout = new KhaltiCheckout(khaltiConfig);
@@ -233,29 +228,29 @@ const Cart = () => {
     };
     createOrderApi(data)
       .then(() => {
-        updateCartStatusApi({ status: "ordered" }).then(() => {
+        updateCartStatusApi({ status: 'ordered' }).then(() => {
           setChange(!change);
         });
-        message.success("Order placed successfully");
+        message.success('Order placed successfully');
       })
       .catch((err) => {
-        message.error(err.response?.data?.message || "Something went wrong");
+        message.error(err.response?.data?.message || 'Something went wrong');
       });
   };
 
   const handleBuyNow = () => {
     if (!address.trim()) {
-      message.error("Please enter your address");
+      message.error('Please enter your address');
       return;
     }
     if (!paymentMethod) {
-      message.error("Please select a payment method");
+      message.error('Please select a payment method');
       return;
     }
-    if (paymentMethod === "Khalti") {
+    if (paymentMethod === 'Khalti') {
       handleKhaltiPayment();
     } else {
-      message.info("Cash on Delivery selected");
+      message.info('Cash on Delivery selected');
       handlePayment();
     }
   };
@@ -265,11 +260,19 @@ const Cart = () => {
       <CartContainer>
         <CartItemsSection>
           {[...Array(3)].map((_, index) => (
-            <Skeleton key={index} active avatar paragraph={{ rows: 3 }} />
+            <Skeleton
+              key={index}
+              active
+              avatar
+              paragraph={{ rows: 3 }}
+            />
           ))}
         </CartItemsSection>
         <BillSection>
-          <Skeleton active paragraph={{ rows: 6 }} />
+          <Skeleton
+            active
+            paragraph={{ rows: 6 }}
+          />
         </BillSection>
       </CartContainer>
     );
@@ -279,8 +282,7 @@ const Cart = () => {
     <CartContainer
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
+      transition={{ duration: 0.5 }}>
       {cartItems.length > 0 ? (
         <>
           <CartItemsSection>
@@ -294,8 +296,7 @@ const Cart = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
+                  transition={{ duration: 0.5, delay: index * 0.1 }}>
                   <Image
                     width={150}
                     src={`http://localhost:5000/products/${cart.productId.productImage}`}
@@ -318,8 +319,8 @@ const Cart = () => {
                       <Input
                         style={{
                           width: 50,
-                          margin: "0 8px",
-                          textAlign: "center",
+                          margin: '0 8px',
+                          textAlign: 'center',
                         }}
                         value={cart.quantity}
                         onChange={(e) =>
@@ -335,16 +336,19 @@ const Cart = () => {
                       />
                     </QuantityControl>
                     <p>
-                      Total: Rs.{" "}
-                      <CountUp isCounting end={cart.total} duration={1} />
+                      Total: Rs.{' '}
+                      <CountUp
+                        isCounting
+                        end={cart.total}
+                        duration={1}
+                      />
                     </p>
                   </ItemDetails>
                   <Button
-                    type="primary"
+                    type='primary'
                     danger
                     icon={<DeleteOutlined />}
-                    onClick={() => handleDeleteCartItem(cart._id)}
-                  >
+                    onClick={() => handleDeleteCartItem(cart._id)}>
                     Delete
                   </Button>
                 </CartItem>
@@ -357,7 +361,12 @@ const Cart = () => {
             <BillItem>
               <span>Subtotal:</span>
               <span>
-                Rs. <CountUp isCounting end={subTotal} duration={1} />
+                Rs.{' '}
+                <CountUp
+                  isCounting
+                  end={subTotal}
+                  duration={1}
+                />
               </span>
             </BillItem>
 
@@ -368,34 +377,38 @@ const Cart = () => {
             <TotalAmount>
               <span>Total:</span>
               <span>
-                Rs. <CountUp isCounting end={total} duration={1} />
+                Rs.{' '}
+                <CountUp
+                  isCounting
+                  end={total}
+                  duration={1}
+                />
               </span>
             </TotalAmount>
 
             <Input
-              placeholder="Enter your address"
+              placeholder='Enter your address'
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              style={{ marginTop: "1rem" }}
+              style={{ marginTop: '1rem' }}
             />
 
             <Radio.Group
               onChange={(e) => setPaymentMethod(e.target.value)}
               value={paymentMethod}
-              style={{ marginTop: "1rem" }}
-            >
-              <Radio value="Khalti">
+              style={{ marginTop: '1rem' }}>
+              <Radio value='Khalti'>
                 <img
-                  src="assets/icons/khalti.png"
-                  alt="Khalti"
+                  src='assets/icons/khalti.png'
+                  alt='Khalti'
                   style={{ width: 20, marginRight: 8 }}
                 />
                 Khalti
               </Radio>
-              <Radio value="Cash On Delivery">
+              <Radio value='Cash On Delivery'>
                 <img
-                  src="assets/icons/cod.png"
-                  alt="Cash on Delivery"
+                  src='assets/icons/cod.png'
+                  alt='Cash on Delivery'
                   style={{ width: 20, marginRight: 8 }}
                 />
                 Cash on Delivery
@@ -403,12 +416,11 @@ const Cart = () => {
             </Radio.Group>
 
             <Button
-              type="primary"
+              type='primary'
               icon={<CreditCardOutlined />}
-              size="large"
+              size='large'
               onClick={handleBuyNow}
-              style={{ marginTop: "1rem", width: "100%" }}
-            >
+              style={{ marginTop: '1rem', width: '100%' }}>
               Place Order
             </Button>
           </BillSection>
@@ -416,7 +428,7 @@ const Cart = () => {
       ) : (
         <EmptyCartMessage>
           <ShoppingCartOutlined
-            style={{ fontSize: 50, marginBottom: "1rem" }}
+            style={{ fontSize: 50, marginBottom: '1rem' }}
           />
           <p>Your cart is empty. Start shopping now!</p>
         </EmptyCartMessage>

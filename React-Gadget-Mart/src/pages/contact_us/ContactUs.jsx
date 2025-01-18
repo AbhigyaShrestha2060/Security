@@ -21,7 +21,6 @@ const ContactUs = () => {
   } = useForm();
 
   const onSubmit = (data) => {
-    console.log(data);
     // Handle form submission
     reset();
   };

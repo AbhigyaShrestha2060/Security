@@ -314,7 +314,6 @@ const Homepage = () => {
   const addToFavorites = (product) => {
     addToFavoriteApi({ productId: product._id })
       .then((res) => {
-        console.log(res.data);
         setFavoriteChange(!favoriteChange);
         toast.success('Added to favorites');
       })
@@ -331,7 +330,6 @@ const Homepage = () => {
   const removeFromFavorites = (product) => {
     deleteFromFavoriteApi(product._id)
       .then((res) => {
-        console.log(res.data);
         setFavoriteChange(!favoriteChange);
         toast.success('Removed from favorites');
       })
@@ -360,7 +358,6 @@ const Homepage = () => {
     const isFavorite = favorites.some(
       (fav) => fav.productId._id === gadget._id
     );
-    console.log('isFavorite', isFavorite);
     if (viewMode === 'grid') {
       return (
         <motion.div
