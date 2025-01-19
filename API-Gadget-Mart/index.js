@@ -10,6 +10,9 @@ const morgan = require('morgan');
 const logActivity = require('./middleware/LogActivity');
 const mongoSanitize = require('express-mongo-sanitize');
 const xssClean = require('xss-clean');
+const fs = require('fs');
+const path = require('path');
+const https = require('https');
 
 // Load environment variables
 dotenv.config();
@@ -52,8 +55,9 @@ app.get('/test', (req, res) => {
 });
 
 const options = {
-  key : fs.readFileSync(path.),
-}
+  key: fs.readFileSync(path.resolve(__dirname, 'server.key')),
+  cert: fs.readFileSync(path.resolve(__dirname, 'server.crt')),
+};
 
 // Define routes
 // Use cartRoutes for /api/cart endpoints
@@ -70,9 +74,8 @@ app.use('/api/logactivity', require('./routes/LogActivityRoutes'));
 // Define port
 const PORT = process.env.PORT || 5500;
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server is started`);
+https.createServer(options, app).listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
 
 module.exports = app;
