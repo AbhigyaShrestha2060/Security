@@ -51,6 +51,10 @@ app.get('/test', (req, res) => {
   res.send('Test API is Working!...');
 });
 
+const options = {
+  key : fs.readFileSync(path.),
+}
+
 // Define routes
 // Use cartRoutes for /api/cart endpoints
 app.use('/api/cart', cartRoutes);
