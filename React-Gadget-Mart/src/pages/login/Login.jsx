@@ -19,12 +19,265 @@ import {
 import React, { useEffect, useState } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import { loginUserApi, verifyMfaCodeApi } from '../../Apis/api';
 
 const { Title, Text, Paragraph } = Typography;
 
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_DURATION = 15 * 60 * 1000;
+
+const COLORS = {
+  primary: '#1a1a2e',
+  secondary: '#4f9cff',
+  accent: '#60a5fa',
+  background: '#0f172a',
+  text: '#f1f5f9',
+  white: '#1e293b',
+  grey: '#334155',
+  error: '#ef4444',
+  warning: '#f59e0b',
+  darkGrey: '#64748b',
+  inputBg: '#1a1a2e',
+  borderColor: '#334155',
+};
+
+const StyledLoginContainer = styled.div`
+  min-height: 100vh;
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    ${COLORS.primary} 0%,
+    ${COLORS.background} 100%
+  );
+
+  .blur-overlay {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      width: 24rem;
+      height: 24rem;
+      border-radius: 50%;
+      background: rgba(79, 156, 255, 0.1);
+      filter: blur(60px);
+    }
+
+    &::before {
+      left: -3rem;
+      top: -3rem;
+      animation: pulse 4s infinite;
+    }
+
+    &::after {
+      right: -3rem;
+      bottom: -3rem;
+      animation: pulse 4s infinite 1s;
+    }
+  }
+
+  @keyframes pulse {
+    0% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 0.8;
+    }
+    100% {
+      opacity: 0.5;
+    }
+  }
+`;
+
+const StyledCard = styled(Card)`
+  width: 100%;
+  max-width: 28rem;
+  backdrop-filter: blur(16px);
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 1rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(79, 156, 255, 0.2);
+
+  .ant-card-body {
+    padding: 2rem;
+  }
+
+  .ant-typography {
+    color: ${COLORS.text};
+
+    &.ant-typography-secondary {
+      color: ${COLORS.darkGrey};
+    }
+  }
+
+  .ant-form-item-label > label {
+    color: ${COLORS.text};
+  }
+
+  .ant-input-affix-wrapper {
+    background: ${COLORS.inputBg};
+    border-color: ${COLORS.borderColor};
+
+    &:hover,
+    &:focus,
+    &-focused {
+      border-color: ${COLORS.secondary};
+      box-shadow: 0 0 0 2px rgba(79, 156, 255, 0.2);
+    }
+
+    input {
+      background: transparent;
+      color: ${COLORS.text};
+
+      &::placeholder {
+        color: ${COLORS.darkGrey};
+      }
+    }
+
+    .anticon {
+      color: ${COLORS.darkGrey};
+
+      &:hover {
+        color: ${COLORS.secondary};
+      }
+    }
+  }
+
+  .ant-btn {
+    &.login-button {
+      background: linear-gradient(45deg, ${COLORS.secondary}, ${COLORS.accent});
+      border: none;
+      height: 3rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: linear-gradient(
+          45deg,
+          ${COLORS.accent},
+          ${COLORS.secondary}
+        );
+        transform: translateY(-1px);
+      }
+
+      &:disabled {
+        background: ${COLORS.darkGrey};
+        opacity: 0.5;
+      }
+    }
+
+    &.google-button {
+      background: ${COLORS.inputBg};
+      border-color: ${COLORS.borderColor};
+      color: ${COLORS.text};
+      height: 3rem;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: ${COLORS.grey};
+        border-color: ${COLORS.secondary};
+      }
+    }
+  }
+
+  .divider {
+    border-color: ${COLORS.borderColor};
+    margin: 2rem 0;
+
+    .divider-text {
+      color: ${COLORS.text};
+      background: ${COLORS.white};
+      padding: 0 1rem;
+    }
+  }
+`;
+
+const StyledModal = styled(Modal)`
+  .ant-modal-content {
+    background: ${COLORS.white};
+
+    .ant-modal-header {
+      background: ${COLORS.white};
+      border-bottom: 1px solid ${COLORS.borderColor};
+
+      .ant-modal-title {
+        color: ${COLORS.text};
+      }
+    }
+
+    .ant-modal-body {
+      .ant-form-item-label > label {
+        color: ${COLORS.text};
+      }
+
+      .ant-input {
+        background: ${COLORS.inputBg};
+        border-color: ${COLORS.borderColor};
+        color: ${COLORS.text};
+
+        &:hover,
+        &:focus {
+          border-color: ${COLORS.secondary};
+          box-shadow: 0 0 0 2px rgba(79, 156, 255, 0.2);
+        }
+
+        &::placeholder {
+          color: ${COLORS.darkGrey};
+        }
+      }
+
+      .ant-btn {
+        background: ${COLORS.secondary};
+        border: none;
+
+        &:hover {
+          background: ${COLORS.accent};
+        }
+
+        &:disabled {
+          background: ${COLORS.darkGrey};
+          opacity: 0.5;
+        }
+      }
+    }
+
+    .ant-modal-close {
+      color: ${COLORS.text};
+
+      &:hover {
+        color: ${COLORS.secondary};
+      }
+    }
+  }
+`;
+
+const StyledAlert = styled(Alert)`
+  background: ${COLORS.inputBg};
+  border: 1px solid ${COLORS.borderColor};
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+
+  .ant-alert-message {
+    color: ${(props) =>
+      props.type === 'error' ? COLORS.error : COLORS.warning};
+  }
+
+  .ant-alert-description {
+    color: ${COLORS.text};
+  }
+
+  .ant-alert-close-icon {
+    color: ${COLORS.text};
+
+    &:hover {
+      color: ${COLORS.secondary};
+    }
+  }
+`;
 
 const Login = () => {
   const [form] = Form.useForm();
@@ -97,21 +350,20 @@ const Login = () => {
         captchaToken,
       });
 
-      const { data } = response;
-
       if (response.status === 200) {
-        if (data.success) {
-          setUserId(data.userId);
+        if (response.data.success) {
+          setUserId(response.data.userId);
           setIsOtpModalVisible(true);
         } else {
-          throw new Error(data.message || 'Login failed');
+          throw new Error(response.data.message || 'Login failed');
         }
       } else {
         handleLoginAttempt();
-        throw new Error(data.message || 'Invalid credentials');
+        throw new Error(response.data.message || 'Invalid credentials');
       }
     } catch (err) {
       setError(err.response?.data?.message || 'An error occurred during login');
+      handleLoginAttempt();
     } finally {
       setLoading(false);
     }
@@ -127,15 +379,15 @@ const Login = () => {
         otp: values.otp,
       });
 
-      const { data } = response;
-
       if (response.status === 200) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
         setIsOtpModalVisible(false);
-        navigate(data.user.role === 'admin' ? '/admin/dashboard' : '/');
+        navigate(
+          response.data.user.role === 'admin' ? '/admin/dashboard' : '/'
+        );
       } else {
-        throw new Error(data.message || 'Invalid OTP');
+        throw new Error(response.data.message || 'Invalid OTP');
       }
     } catch (err) {
       setError(err.response?.data?.message || 'OTP verification failed');
@@ -145,55 +397,43 @@ const Login = () => {
   };
 
   return (
-    <div className='min-h-screen relative bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500'>
-      <div className='absolute inset-0 overflow-hidden'>
-        <div className='absolute w-96 h-96 -left-12 -top-12 bg-white/10 rounded-full blur-3xl animate-pulse'></div>
-        <div className='absolute w-96 h-96 -right-12 -bottom-12 bg-white/10 rounded-full blur-3xl animate-pulse delay-1000'></div>
-      </div>
-
+    <StyledLoginContainer>
+      <div className='blur-overlay items-center' />
       <div className='relative min-h-screen flex items-center justify-center p-4'>
-        <Card
-          className='w-full max-w-md backdrop-blur-lg bg-white/90'
-          style={{
-            borderRadius: '1rem',
-            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.1)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-          }}>
+        <StyledCard>
           <Spin
             spinning={loading}
             size='large'>
             <div className='text-center mb-8'>
-              <KeyOutlined className='text-5xl text-blue-500 mb-4' />
-              <Title
-                level={2}
-                className='!mb-2'>
-                Welcome Back
-              </Title>
+              <KeyOutlined
+                style={{
+                  fontSize: '3rem',
+                  color: COLORS.secondary,
+                  marginBottom: '1rem',
+                }}
+              />
+              <Title level={2}>Welcome Back</Title>
               <Paragraph type='secondary'>
                 Enter your credentials to access your account
               </Paragraph>
             </div>
 
             {error && (
-              <Alert
+              <StyledAlert
                 message='Error'
                 description={error}
                 type='error'
                 showIcon
                 closable
-                className='mb-6'
-                style={{ borderRadius: '0.5rem' }}
               />
             )}
 
             {isLocked && lockoutEndTime && (
-              <Alert
+              <StyledAlert
                 message='Account Temporarily Locked'
                 description={`Too many failed attempts. Please try again after ${lockoutEndTime.toLocaleTimeString()}`}
                 type='warning'
                 showIcon
-                className='mb-6'
-                style={{ borderRadius: '0.5rem' }}
               />
             )}
 
@@ -207,30 +447,26 @@ const Login = () => {
                 name='email'
                 rules={[{ validator: validateEmail }]}>
                 <Input
-                  prefix={<UserOutlined className='text-gray-400' />}
+                  prefix={<UserOutlined />}
                   placeholder='Email'
                   disabled={isLocked}
                   autoComplete='email'
-                  className='rounded-lg'
-                  style={{ height: '3rem' }}
                 />
               </Form.Item>
 
-              <Form.Item name='password'>
+              <Form.Item
+                name='password'
+                rules={[
+                  { required: true, message: 'Please enter your password' },
+                ]}>
                 <Input.Password
-                  prefix={<LockOutlined className='text-gray-400' />}
+                  prefix={<LockOutlined />}
                   placeholder='Password'
                   disabled={isLocked}
                   iconRender={(visible) =>
-                    visible ? (
-                      <EyeTwoTone className='text-gray-400' />
-                    ) : (
-                      <EyeInvisibleOutlined className='text-gray-400' />
-                    )
+                    visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
                   }
                   autoComplete='current-password'
-                  className='rounded-lg'
-                  style={{ height: '3rem' }}
                 />
               </Form.Item>
 
@@ -238,7 +474,7 @@ const Login = () => {
                 <ReCAPTCHA
                   sitekey='6LeqWbMqAAAAAJsPdQqXcEX6M-68zQNUex8sYCgA'
                   onChange={setCaptchaToken}
-                  theme='light'
+                  theme='dark'
                 />
               </div>
 
@@ -248,41 +484,29 @@ const Login = () => {
                   htmlType='submit'
                   block
                   disabled={isLocked || !captchaToken}
-                  className='h-12 rounded-lg'
-                  style={{
-                    background: 'linear-gradient(to right, #3b82f6, #8b5cf6)',
-                    border: 'none',
-                  }}>
+                  className='login-button'>
                   Log In
                 </Button>
               </Form.Item>
 
-              <div className='relative my-8'>
-                <div className='absolute inset-0 flex items-center'>
-                  <div className='w-full border-t border-gray-200'></div>
-                </div>
-                <div className='relative flex justify-center text-sm'>
-                  <span className='px-4 bg-white text-gray-500'>
-                    Or continue with
-                  </span>
+              <div className='divider'>
+                <div className='relative flex justify-center'>
+                  <span className='divider-text'>Or continue with</span>
                 </div>
               </div>
 
               <Button
                 icon={<GoogleOutlined />}
-                type='default'
                 block
-                size='large'
-                className='!h-12 rounded-lg'>
+                className='google-button'>
                 Google
               </Button>
             </Form>
           </Spin>
-        </Card>
+        </StyledCard>
       </div>
 
-      {/* OTP Verification Modal */}
-      <Modal
+      <StyledModal
         title='Enter OTP'
         open={isOtpModalVisible}
         footer={null}
@@ -301,7 +525,6 @@ const Login = () => {
             <Input
               placeholder='Enter 6-digit OTP'
               maxLength={6}
-              className='rounded-lg'
             />
           </Form.Item>
           <Form.Item>
@@ -309,14 +532,21 @@ const Login = () => {
               type='primary'
               htmlType='submit'
               block
-              loading={loading}
-              className='rounded-lg'>
+              loading={loading}>
               Verify OTP
             </Button>
           </Form.Item>
         </Form>
-      </Modal>
-    </div>
+      </StyledModal>
+
+      <style
+        jsx
+        global>{`
+        .recaptcha-dark {
+          filter: invert(0.9) hue-rotate(180deg);
+        }
+      `}</style>
+    </StyledLoginContainer>
   );
 };
 

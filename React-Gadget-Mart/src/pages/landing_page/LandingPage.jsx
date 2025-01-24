@@ -1,196 +1,232 @@
-import React, { useState } from "react";
-import "./LandingPage.css";
+import { LockOutlined, SyncOutlined, TruckOutlined } from '@ant-design/icons';
+import {
+  Button,
+  Card,
+  Col,
+  Layout,
+  Modal,
+  Row,
+  Statistic,
+  Typography,
+} from 'antd';
+import React, { useState } from 'react';
+
+const { Header, Content } = Layout;
+const { Title, Paragraph } = Typography;
 
 const LandingPage = () => {
-  const [videoModalOpen, setVideoModalOpen] = useState(false);
-
-  const openVideoModal = () => {
-    setVideoModalOpen(true);
-  };
-
-  const closeVideoModal = () => {
-    setVideoModalOpen(false);
-  };
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   const products = [
     {
       id: 1,
-      name: "Wireless Headphones",
-      description: "Premium sound quality with noise cancellation",
-      image:
-        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
+      name: 'Wireless Headphones',
+      description: 'Premium sound quality with noise cancellation',
+      image: '/assets/images/headphone.png',
     },
     {
       id: 2,
-      name: "Gaming Mouse",
-      description: "High-precision optical sensor for pro gamers",
-      image:
-        "https://images.unsplash.com/photo-1527814050087-3793815479db?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1028&q=80",
+      name: 'Mac Book',
+      description: 'High-precision optical sensor for pro gamers',
+      image: '/assets/images/macbook.png',
     },
     {
       id: 3,
-      name: "Ultrabook Laptop",
-      description: "Powerful performance in a slim design",
-      image:
-        "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1171&q=80",
+      name: 'Ultrabook Laptop',
+      description: 'Powerful performance in a slim design',
+      image: '/assets/images/laptop.png',
     },
     {
       id: 4,
-      name: "Condenser Microphone",
-      description: "Studio-quality audio recording",
-      image:
-        "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
+      name: 'Condenser Microphone',
+      description: 'Studio-quality audio recording',
+      image: '/assets/images/mic.png',
     },
   ];
 
   return (
-    <div className="landing-page">
-      <section className="hero">
-        <div className="hero-content">
-          <div className="hero-text">
-            <h1 className="title">
-              Discover Amazing <span className="highlight">Gadgets</span>
-            </h1>
-            <p className="subtitle">
-              Explore our curated collection of cutting-edge technology and
-              innovative products designed to enhance your daily life.
-            </p>
-            <div className="hero-actions">
-              <a href="#products" className="btn btn-primary">
-                Shop Now
-              </a>
-              <button className="btn btn-secondary" onClick={openVideoModal}>
-                Watch Video
-              </button>
-            </div>
+    <Layout className='min-h-screen'>
+      <Content>
+        {/* Hero Section */}
+        <section className='bg-gray-50 py-20'>
+          <div className='max-w-7xl mx-auto px-4'>
+            <Row
+              gutter={[48, 48]}
+              align='middle'>
+              <Col
+                xs={24}
+                md={12}>
+                <Title>
+                  Discover Amazing{' '}
+                  <span className='text-blue-600'>Gadgets</span>
+                </Title>
+                <Paragraph className='text-lg mb-8'>
+                  Explore our curated collection of cutting-edge technology
+                </Paragraph>
+                <div className='space-x-4'>
+                  <Button
+                    type='primary'
+                    size='large'>
+                    Shop Now
+                  </Button>
+                </div>
+              </Col>
+              <Col
+                xs={24}
+                md={12}>
+                <img
+                  src='/assets/images/iphone.png'
+                  alt='Hero'
+                  className='rounded-lg shadow-lg w-75'
+                />
+              </Col>
+            </Row>
+
+            {/* Stats */}
+            <Row
+              gutter={[32, 32]}
+              className='mt-16'>
+              <Col
+                xs={24}
+                md={8}>
+                <Card>
+                  <Statistic
+                    title='Products'
+                    value='299K+'
+                  />
+                </Card>
+              </Col>
+              <Col
+                xs={24}
+                md={8}>
+                <Card>
+                  <Statistic
+                    title='Sellers'
+                    value='99K+'
+                  />
+                </Card>
+              </Col>
+              <Col
+                xs={24}
+                md={8}>
+                <Card>
+                  <Statistic
+                    title='Reviews'
+                    value='2K+'
+                  />
+                </Card>
+              </Col>
+            </Row>
           </div>
-          <div className="hero-image">
-            <img
-              src="https://images.unsplash.com/photo-1573920011462-eb3003086611?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
-              alt="Latest gadgets"
+        </section>
+
+        {/* Products Section */}
+        <section className='py-20'>
+          <div className='max-w-7xl mx-auto px-4'>
+            <Title className='text-center'>Featured Products</Title>
+            <Row
+              gutter={[32, 32]}
+              className='mt-12'>
+              {products.map((product) => (
+                <Col
+                  xs={24}
+                  sm={12}
+                  lg={6}
+                  key={product.id}>
+                  <Card
+                    hoverable
+                    cover={
+                      <img
+                        alt={product.name}
+                        src={product.image}
+                        className='h-64 w-full object-contain'
+                      />
+                    }
+                    className='h-full'>
+                    <Card.Meta
+                      title={product.name}
+                      description={product.description}
+                    />
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className='bg-gray-50 py-20'>
+          <div className='max-w-7xl mx-auto px-4'>
+            <Title className='text-center'>Why Choose Us</Title>
+            <Row
+              gutter={[32, 32]}
+              className='mt-12'>
+              <Col
+                xs={24}
+                md={8}>
+                <Card className='text-center'>
+                  <TruckOutlined className='text-4xl text-blue-600 mb-4' />
+                  <Title level={4}>Free Shipping</Title>
+                  <Paragraph>Free shipping on orders over $50</Paragraph>
+                </Card>
+              </Col>
+              <Col
+                xs={24}
+                md={8}>
+                <Card className='text-center'>
+                  <LockOutlined className='text-4xl text-blue-600 mb-4' />
+                  <Title level={4}>Secure Payments</Title>
+                  <Paragraph>Your transactions are always safe</Paragraph>
+                </Card>
+              </Col>
+              <Col
+                xs={24}
+                md={8}>
+                <Card className='text-center'>
+                  <SyncOutlined className='text-4xl text-blue-600 mb-4' />
+                  <Title level={4}>Easy Returns</Title>
+                  <Paragraph>30-day money-back guarantee</Paragraph>
+                </Card>
+              </Col>
+            </Row>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className='bg-blue-600 text-white py-20'>
+          <div className='max-w-7xl mx-auto px-4 text-center'>
+            <Title className='text-white'>Ready to Upgrade Your Tech?</Title>
+            <Paragraph className='text-lg mb-8'>
+              Join thousands of satisfied customers today
+            </Paragraph>
+            <Button
+              size='large'
+              ghost>
+              Shop Now
+            </Button>
+          </div>
+        </section>
+
+        {/* Video Modal */}
+        <Modal
+          open={isVideoModalOpen}
+          onCancel={() => setIsVideoModalOpen(false)}
+          footer={null}
+          width={800}
+          centered>
+          <div className='aspect-w-16 aspect-h-9'>
+            <iframe
+              className='w-full h-full'
+              src='https://www.youtube.com/embed/dQw4w9WgXcQ'
+              title='Product Video'
+              frameBorder='0'
+              allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+              allowFullScreen
             />
           </div>
-        </div>
-        <div className="hero-stats">
-          <div className="stat-item">
-            <p className="stat-number">299K+</p>
-            <p className="stat-label">Products</p>
-          </div>
-          <div className="stat-item">
-            <p className="stat-number">99K+</p>
-            <p className="stat-label">Sellers</p>
-          </div>
-          <div className="stat-item">
-            <p className="stat-number">2K+</p>
-            <p className="stat-label">Positive Reviews</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="featured-products" id="products">
-        <div className="container">
-          <h2 className="title">Featured Products</h2>
-          <p className="subtitle">
-            Check out our latest and most popular gadgets that are
-            revolutionizing the tech world.
-          </p>
-          <div className="products">
-            {products.map((product) => (
-              <div key={product.id} className="product-item">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="product-image"
-                />
-                <div className="product-info">
-                  <h3 className="product-title">{product.name}</h3>
-                  <p className="product-description">{product.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="features">
-        <div className="container">
-          <h2 className="title">Why Choose Us</h2>
-          <p className="subtitle">
-            We offer more than just products. Experience the difference with our
-            unique features and services.
-          </p>
-          <div className="features-grid">
-            <div className="feature-item">
-              <div className="feature-icon">🚚</div>
-              <h3 className="feature-title">Free Shipping</h3>
-              <p className="feature-description">
-                Enjoy free shipping on all orders over $50
-              </p>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon">🔒</div>
-              <h3 className="feature-title">Secure Payments</h3>
-              <p className="feature-description">
-                Your transactions are always safe and encrypted
-              </p>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon">🔄</div>
-              <h3 className="feature-title">Easy Returns</h3>
-              <p className="feature-description">
-                30-day money-back guarantee on all purchases
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="testimonial">
-        <div className="container">
-          <h2 className="title">What Our Customers Say</h2>
-          <div className="testimonial-content">
-            <p className="testimonial-text">
-              "I've been a loyal customer for years, and I'm always impressed by
-              the quality of products and excellent customer service. Highly
-              recommended!"
-            </p>
-            <p className="testimonial-author">- Sarah Johnson</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="cta">
-        <div className="container">
-          <h2 className="cta-title">Ready to Upgrade Your Tech?</h2>
-          <p className="cta-description">
-            Join thousands of satisfied customers and experience the future of
-            technology today.
-          </p>
-          <a href="#products" className="btn btn-secondary">
-            Shop Now
-          </a>
-        </div>
-      </section>
-
-      {videoModalOpen && (
-        <div className="video-modal">
-          <div className="video-modal-content">
-            <button className="close-modal" onClick={closeVideoModal}>
-              &times;
-            </button>
-            <iframe
-              width="560"
-              height="315"
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-              title="Product Video"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
-          </div>
-        </div>
-      )}
-    </div>
+        </Modal>
+      </Content>
+    </Layout>
   );
 };
 

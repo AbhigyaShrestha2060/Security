@@ -41,85 +41,153 @@ const { Search } = Input;
 const { Option } = Select;
 const { Title, Text, Paragraph } = Typography;
 
+const COLORS = {
+  primary: '#1a1a2e',
+  secondary: '#4f9cff',
+  accent: '#60a5fa',
+  background: '#0f172a',
+  text: '#f1f5f9',
+  white: '#1e293b',
+  grey: '#334155',
+};
+
 const StyledHomepage = styled.div`
+  min-height: 100vh;
+  background: ${COLORS.background};
   padding: 2rem 0;
 
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
   .carousel-container {
-    margin-bottom: 2rem;
-    border-radius: 8px;
+    margin-bottom: 3rem;
+    border-radius: 24px;
     overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  .ant-carousel .slick-slide {
-    text-align: center;
-    height: 400px;
-    line-height: 400px;
-    background: #364d79;
-    overflow: hidden;
-  }
-
-  .ant-carousel .slick-slide img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .carousel-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    text-align: center;
-    z-index: 1;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
   }
 
   .search-container {
-    margin: 2rem 0;
+    max-width: 800px;
+    margin: 2rem auto 3rem;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 4px;
+      background: linear-gradient(90deg, ${COLORS.accent}, ${COLORS.secondary});
+      border-radius: 2px;
+    }
+
+    .ant-input-search {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 2px solid ${COLORS.secondary};
+
+      .ant-input {
+        font-size: 1.1rem;
+        padding: 12px 24px;
+        background: ${COLORS.white};
+        color: ${COLORS.text};
+      }
+
+      .ant-btn {
+        height: 54px;
+        width: 60px;
+        background: ${COLORS.secondary};
+        &:hover {
+          background: ${COLORS.accent};
+        }
+      }
+    }
   }
 
-  .products-container {
+  .section-title {
+    color: ${COLORS.text};
+    font-size: 2.2rem;
     margin-bottom: 2rem;
-  }
+    position: relative;
+    display: inline-block;
 
-  .ant-pagination {
-    text-align: center;
-    margin-top: 2rem;
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 40%;
+      height: 4px;
+      background: ${COLORS.secondary};
+      border-radius: 2px;
+    }
   }
 
   .controls-container {
+    background: ${COLORS.white};
+    padding: 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    margin-bottom: 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
-  }
+    border: 1px solid rgba(255, 255, 255, 0.1);
 
-  .view-controls {
-    display: flex;
-    align-items: center;
-  }
+    .view-controls {
+      .ant-radio-button-wrapper {
+        padding: 8px 16px;
+        border-color: ${COLORS.secondary};
+        color: ${COLORS.text};
+        background: ${COLORS.white};
 
-  .sort-control {
-    width: 200px;
-  }
+        &-checked {
+          background: ${COLORS.secondary};
+          color: ${COLORS.background};
+        }
+      }
+    }
 
-  .cart-icon {
-    font-size: 24px;
-    cursor: pointer;
+    .sort-control {
+      min-width: 200px;
+      .ant-select-selector {
+        border-color: ${COLORS.secondary};
+        border-radius: 8px;
+        background: ${COLORS.white};
+        color: ${COLORS.text};
+      }
+    }
+
+    .cart-icon {
+      font-size: 28px;
+      color: ${COLORS.text};
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: ${COLORS.secondary};
+        transform: scale(1.1);
+      }
+    }
   }
 `;
 
 const ProductGrid = styled(motion.div)`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 2rem;
+  margin-bottom: 3rem;
 `;
 
 const ProductList = styled(motion.div)`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
 `;
 
 const CarouselItem = styled.div`
@@ -133,7 +201,7 @@ const CarouselItem = styled.div`
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.5);
   }
 
   img {
@@ -141,67 +209,153 @@ const CarouselItem = styled.div`
     height: 100%;
     object-fit: cover;
   }
-`;
 
-const ListViewItem = styled.div`
-  display: flex;
-  align-items: center;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  transition: all 0.3s ease;
+  .carousel-content {
+    position: absolute;
+    bottom: 40px;
+    left: 40px;
+    z-index: 1;
+    color: ${COLORS.text};
 
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
+    h2 {
+      color: ${COLORS.text};
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
 
-  .list-image-container {
-    width: 200px;
-    height: 200px;
-    flex-shrink: 0;
-    overflow: hidden;
-  }
-
-  .list-content {
-    flex-grow: 1;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-
-  .list-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 1rem;
+    p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
   }
 `;
 
 const GridViewItem = styled(Card)`
+  background: ${COLORS.white};
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  }
+
   .ant-card-cover {
-    height: 300px;
+    height: 280px;
     overflow: hidden;
+    background: ${COLORS.background};
+
+    img {
+      transition: transform 0.3s ease;
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
   }
 
   .ant-card-body {
-    padding: 1rem;
+    padding: 1.5rem;
+    background: ${COLORS.white};
   }
 
   .ant-card-meta-title {
-    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+    color: ${COLORS.text};
+  }
+
+  .ant-card-meta-description {
+    color: ${COLORS.text};
   }
 
   .price {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: ${COLORS.secondary};
+    margin: 1rem 0;
+    display: block;
   }
 
-  .grid-actions {
+  .ant-card-actions {
+    background: ${COLORS.background};
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    li {
+      margin: 12px 0;
+    }
+  }
+`;
+
+const ListViewItem = styled.div`
+  background: ${COLORS.white};
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    transform: translateX(4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+
+  .list-image-container {
+    width: 240px;
+    height: 240px;
+    overflow: hidden;
+    background: ${COLORS.background};
+
+    img {
+      transition: transform 0.3s ease;
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+  }
+
+  .list-content {
+    flex: 1;
+    padding: 2rem;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 1rem;
+    color: ${COLORS.text};
+
+    h3 {
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
+      color: ${COLORS.text};
+    }
+
+    .price {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: ${COLORS.secondary};
+    }
+  }
+
+  .list-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+
+    button {
+      min-width: 120px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: ${COLORS.background};
+      border-color: ${COLORS.secondary};
+      color: ${COLORS.text};
+
+      &:hover {
+        background: ${COLORS.secondary};
+        color: ${COLORS.background};
+      }
+    }
   }
 `;
 
@@ -306,8 +460,10 @@ const Homepage = () => {
         total: product.productPrice,
       });
       await fetchCart();
+      toast.success('Added to cart successfully');
     } catch (error) {
       console.error('Error adding to cart:', error);
+      toast.error('Failed to add to cart');
     }
   };
 
@@ -378,15 +534,23 @@ const Homepage = () => {
             }
             actions={[
               <Tooltip title='Add to Cart'>
-                <ShoppingCartOutlined onClick={() => addToCart(gadget)} />
-              </Tooltip>,
-              <Tooltip title='Add to Favorites'>
                 <Button
+                  type='text'
+                  icon={<ShoppingCartOutlined style={{ color: COLORS.text }} />}
+                  onClick={() => addToCart(gadget)}
+                />
+              </Tooltip>,
+              <Tooltip
+                title={
+                  isFavorite ? 'Remove from Favorites' : 'Add to Favorites'
+                }>
+                <Button
+                  type='text'
                   icon={
                     isFavorite ? (
-                      <HeartFilled style={{ color: 'red' }} />
+                      <HeartFilled style={{ color: COLORS.secondary }} />
                     ) : (
-                      <HeartOutlined />
+                      <HeartOutlined style={{ color: COLORS.text }} />
                     )
                   }
                   onClick={() =>
@@ -394,23 +558,29 @@ const Homepage = () => {
                       ? removeFromFavorites(gadget)
                       : addToFavorites(gadget)
                   }
-                  // remove border
-                  type='text'
                 />
               </Tooltip>,
               <Tooltip title='View Details'>
-                <EyeOutlined onClick={() => showProductDetails(gadget)} />
+                <Button
+                  type='text'
+                  icon={<EyeOutlined style={{ color: COLORS.text }} />}
+                  onClick={() => showProductDetails(gadget)}
+                />
               </Tooltip>,
             ]}>
             <Card.Meta
               title={gadget.productName}
               description={
-                <Paragraph ellipsis={{ rows: 2 }}>
+                <Paragraph
+                  ellipsis={{ rows: 2 }}
+                  style={{ color: COLORS.text }}>
                   {gadget.productDescription}
                 </Paragraph>
               }
             />
-            <Text className='price'>Rs {gadget.productPrice}</Text>
+            <Text className='price'>
+              Rs {gadget.productPrice.toLocaleString()}
+            </Text>
           </GridViewItem>
         </motion.div>
       );
@@ -418,14 +588,13 @@ const Homepage = () => {
       return (
         <motion.div
           key={gadget._id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 20 }}
           transition={{ duration: 0.3 }}>
           <ListViewItem>
             <div className='list-image-container'>
               <Image
-                className='list-image'
                 src={`http://localhost:5000/products/${gadget.productImage}`}
                 alt={gadget.productName}
                 preview={false}
@@ -438,38 +607,36 @@ const Homepage = () => {
                 <Paragraph ellipsis={{ rows: 2 }}>
                   {gadget.productDescription}
                 </Paragraph>
-                <Text strong>Rs {gadget.productPrice}</Text>
+                <Text className='price'>
+                  Rs {gadget.productPrice.toLocaleString()}
+                </Text>
               </div>
               <div className='list-actions'>
-                <Tooltip title='Add to Cart'>
-                  <Button
-                    icon={<ShoppingCartOutlined />}
-                    onClick={() => addToCart(gadget)}>
-                    Add to Cart
-                  </Button>
-                </Tooltip>
-                <Tooltip title='Add to Favorites'>
-                  <Button
-                    icon={
-                      isFavorite ? (
-                        <HeartFilled style={{ color: 'red' }} />
-                      ) : (
-                        <HeartOutlined />
-                      )
-                    }
-                    onClick={() =>
-                      isFavorite
-                        ? removeFromFavorites(gadget)
-                        : addToFavorites(gadget)
-                    }
-                  />
-                </Tooltip>
-                <Tooltip title='View Details'>
-                  <Button
-                    icon={<EyeOutlined />}
-                    onClick={() => showProductDetails(gadget)}
-                  />
-                </Tooltip>
+                <Button
+                  icon={<ShoppingCartOutlined />}
+                  onClick={() => addToCart(gadget)}>
+                  Add to Cart
+                </Button>
+                <Button
+                  icon={
+                    isFavorite ? (
+                      <HeartFilled style={{ color: COLORS.secondary }} />
+                    ) : (
+                      <HeartOutlined />
+                    )
+                  }
+                  onClick={() =>
+                    isFavorite
+                      ? removeFromFavorites(gadget)
+                      : addToFavorites(gadget)
+                  }>
+                  {isFavorite ? 'Remove Favorite' : 'Add Favorite'}
+                </Button>
+                <Button
+                  icon={<EyeOutlined />}
+                  onClick={() => showProductDetails(gadget)}>
+                  View Details
+                </Button>
               </div>
             </div>
           </ListViewItem>
@@ -522,14 +689,20 @@ const Homepage = () => {
           <Search
             placeholder='Search for gadgets'
             allowClear
-            enterButton={<SearchOutlined />}
+            enterButton={
+              <SearchOutlined style={{ color: COLORS.background }} />
+            }
             size='large'
             onSearch={handleSearch}
             onChange={(e) => handleSearch(e.target.value)}
           />
         </div>
 
-        <Title level={2}>Available Products</Title>
+        <Title
+          level={2}
+          style={{ color: COLORS.text }}>
+          Available Products
+        </Title>
 
         <div className='controls-container'>
           <div className='view-controls'>
@@ -547,7 +720,11 @@ const Homepage = () => {
           <Select
             className='sort-control'
             defaultValue='name_asc'
-            onChange={handleSort}>
+            onChange={handleSort}
+            dropdownStyle={{
+              background: COLORS.white,
+              color: COLORS.text,
+            }}>
             <Option value='name_asc'>Sort by Name (A-Z)</Option>
             <Option value='name_desc'>Sort by Name (Z-A)</Option>
             <Option value='price_asc'>Sort by Price (Low to High)</Option>
@@ -556,7 +733,9 @@ const Homepage = () => {
           <Link to='/cart'>
             <Badge
               count={cartItemCount}
-              showZero>
+              style={{
+                backgroundColor: COLORS.secondary,
+              }}>
               <ShoppingCartOutlined className='cart-icon' />
             </Badge>
           </Link>
@@ -581,7 +760,12 @@ const Homepage = () => {
               )}
             </motion.div>
           ) : (
-            <Empty description='No products found' />
+            <Empty
+              description={
+                <span style={{ color: COLORS.text }}>No products found</span>
+              }
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+            />
           )}
         </AnimatePresence>
 
@@ -595,16 +779,38 @@ const Homepage = () => {
           showTotal={(total, range) =>
             `${range[0]}-${range[1]} of ${total} items`
           }
+          style={{
+            textAlign: 'center',
+            margin: '2rem 0',
+            '& .ant-pagination-item': {
+              backgroundColor: COLORS.white,
+              borderColor: COLORS.secondary,
+              color: COLORS.text,
+            },
+            '& .ant-pagination-item-active': {
+              backgroundColor: COLORS.secondary,
+              borderColor: COLORS.secondary,
+            },
+          }}
         />
 
         <Modal
-          title={selectedGadget?.productName}
+          title={
+            <Text style={{ color: COLORS.text }}>
+              {selectedGadget?.productName}
+            </Text>
+          }
           visible={isModalVisible}
           onCancel={handleModalClose}
           footer={[
             <Button
               key='close'
-              onClick={handleModalClose}>
+              onClick={handleModalClose}
+              style={{
+                background: COLORS.background,
+                borderColor: COLORS.secondary,
+                color: COLORS.text,
+              }}>
               Close
             </Button>,
             <Button
@@ -613,18 +819,45 @@ const Homepage = () => {
               onClick={() => {
                 addToCart(selectedGadget);
                 handleModalClose();
+              }}
+              style={{
+                background: COLORS.secondary,
+                borderColor: COLORS.secondary,
               }}>
               Add to Cart
             </Button>,
             <Button
               key='addToFavorites'
               onClick={() => {
-                addToFavorites(selectedGadget);
+                const isFavorite = favorites.some(
+                  (fav) => fav.productId._id === selectedGadget._id
+                );
+                if (isFavorite) {
+                  removeFromFavorites(selectedGadget);
+                } else {
+                  addToFavorites(selectedGadget);
+                }
                 handleModalClose();
+              }}
+              style={{
+                background: COLORS.background,
+                borderColor: COLORS.secondary,
+                color: COLORS.text,
               }}>
-              Add to Favorites
+              {favorites.some(
+                (fav) => fav.productId._id === selectedGadget?._id
+              )
+                ? 'Remove from Favorites'
+                : 'Add to Favorites'}
             </Button>,
-          ]}>
+          ]}
+          bodyStyle={{ background: COLORS.white }}
+          style={{
+            '& .ant-modal-content': {
+              background: COLORS.white,
+              color: COLORS.text,
+            },
+          }}>
           {selectedGadget && (
             <>
               <Image
@@ -632,8 +865,17 @@ const Homepage = () => {
                 alt={selectedGadget.productName}
                 style={{ width: '100%', marginBottom: '16px' }}
               />
-              <Paragraph>{selectedGadget.productDescription}</Paragraph>
-              <Text strong>Price: Rs {selectedGadget.productPrice}</Text>
+              <Paragraph style={{ color: COLORS.text }}>
+                {selectedGadget.productDescription}
+              </Paragraph>
+              <Text
+                style={{
+                  color: COLORS.secondary,
+                  fontSize: '1.2rem',
+                  fontWeight: 600,
+                }}>
+                Price: Rs {selectedGadget.productPrice.toLocaleString()}
+              </Text>
             </>
           )}
         </Modal>
