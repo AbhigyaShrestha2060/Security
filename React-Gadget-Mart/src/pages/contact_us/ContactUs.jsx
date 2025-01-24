@@ -12,6 +12,178 @@ import {
 } from 'react-icons/fa';
 import styled from 'styled-components';
 
+const Container = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 50px 20px;
+  font-family: 'Poppins', sans-serif;
+  background-color: #0f172a;
+`;
+
+const ContentWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  margin-bottom: 40px;
+  background-color: #1e293b;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+`;
+
+const InfoSection = styled(motion.div)`
+  flex: 1;
+  min-width: 300px;
+  padding: 40px;
+  background-color: #1a1a2e;
+  color: #f1f5f9;
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #4f9cff;
+  }
+
+  p {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    opacity: 0.9;
+  }
+`;
+
+const ContactInfo = styled.div`
+  margin-bottom: 30px;
+`;
+
+const InfoItem = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  font-size: 1rem;
+
+  svg {
+    margin-right: 15px;
+    font-size: 1.2rem;
+    color: #60a5fa;
+  }
+`;
+
+const SocialLinks = styled.div`
+  display: flex;
+  gap: 15px;
+`;
+
+const SocialIcon = styled.a`
+  color: #f1f5f9;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: #60a5fa;
+    transform: translateY(-3px);
+  }
+`;
+
+const FormSection = styled(motion.div)`
+  flex: 1;
+  min-width: 300px;
+  padding: 40px;
+  background-color: #1e293b;
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const InputGroup = styled.div`
+  position: relative;
+`;
+
+const Input = styled.input`
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background-color: #1a1a2e;
+  color: #f1f5f9;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+
+  &:focus {
+    border-color: #4f9cff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(79, 156, 255, 0.2);
+  }
+
+  &::placeholder {
+    color: #cbd5e1;
+  }
+`;
+
+const Textarea = styled.textarea`
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background-color: #1a1a2e;
+  color: #f1f5f9;
+  font-size: 1rem;
+  min-height: 150px;
+  resize: vertical;
+  transition: all 0.3s ease;
+
+  &:focus {
+    border-color: #4f9cff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(79, 156, 255, 0.2);
+  }
+
+  &::placeholder {
+    color: #cbd5e1;
+  }
+`;
+
+const ErrorMessage = styled.span`
+  color: #f87171;
+  font-size: 0.8rem;
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+`;
+
+const SubmitButton = styled(motion.button)`
+  background-color: #4f9cff;
+  color: #0f172a;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #60a5fa;
+    transform: translateY(-2px);
+  }
+`;
+
+const ImageSection = styled.div`
+  width: 100%;
+  height: 300px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.8);
+  }
+`;
+
 const ContactUs = () => {
   const {
     register,
@@ -22,13 +194,17 @@ const ContactUs = () => {
 
   const onSubmit = (data) => {
     // Handle form submission
+    console.log(data);
     reset();
   };
 
   return (
     <Container>
       <ContentWrapper>
-        <InfoSection>
+        <InfoSection
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}>
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -70,7 +246,10 @@ const ContactUs = () => {
             </SocialIcon>
           </SocialLinks>
         </InfoSection>
-        <FormSection>
+        <FormSection
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}>
           <Form onSubmit={handleSubmit(onSubmit)}>
             <InputGroup>
               <Input
@@ -132,157 +311,5 @@ const ContactUs = () => {
     </Container>
   );
 };
-
-const Container = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 50px 20px;
-  font-family: 'Poppins', sans-serif;
-  background-color: #f9f9f9;
-`;
-
-const ContentWrapper = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 40px;
-  margin-bottom: 40px;
-  background-color: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-`;
-
-const InfoSection = styled(motion.div)`
-  flex: 1;
-  min-width: 300px;
-  padding: 40px;
-  background-color: #3498db;
-  color: #ffffff;
-
-  h1 {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-  }
-
-  p {
-    font-size: 1.1rem;
-    margin-bottom: 30px;
-    opacity: 0.9;
-  }
-`;
-
-const ContactInfo = styled.div`
-  margin-bottom: 30px;
-`;
-
-const InfoItem = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px;
-  font-size: 1rem;
-
-  svg {
-    margin-right: 15px;
-    font-size: 1.2rem;
-  }
-`;
-
-const SocialLinks = styled.div`
-  display: flex;
-  gap: 15px;
-`;
-
-const SocialIcon = styled.a`
-  color: #ffffff;
-  font-size: 1.2rem;
-  transition: transform 0.3s ease;
-
-  &:hover {
-    transform: translateY(-3px);
-  }
-`;
-
-const FormSection = styled(motion.div)`
-  flex: 1;
-  min-width: 300px;
-  padding: 40px;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
-const InputGroup = styled.div`
-  position: relative;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 12px 15px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-
-  &:focus {
-    border-color: #3498db;
-    outline: none;
-  }
-`;
-
-const Textarea = styled.textarea`
-  width: 100%;
-  padding: 12px 15px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  font-size: 1rem;
-  min-height: 150px;
-  resize: vertical;
-  transition: border-color 0.3s ease;
-
-  &:focus {
-    border-color: #3498db;
-    outline: none;
-  }
-`;
-
-const ErrorMessage = styled.span`
-  color: #e74c3c;
-  font-size: 0.8rem;
-  position: absolute;
-  bottom: -20px;
-  left: 0;
-`;
-
-const SubmitButton = styled(motion.button)`
-  background-color: #3498db;
-  color: #fff;
-  border: none;
-  padding: 12px 25px;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: #2980b9;
-  }
-`;
-
-const ImageSection = styled.div`
-  width: 100%;
-  height: 300px;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-`;
 
 export default ContactUs;

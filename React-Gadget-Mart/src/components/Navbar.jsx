@@ -1,13 +1,13 @@
-import { Icon } from "@iconify/react";
-import { AnimatePresence, motion } from "framer-motion";
-import React, { useEffect, useState } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
-import styled from "styled-components";
+import { Icon } from '@iconify/react';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
+import styled from 'styled-components';
 
 const StyledNavbar = styled(motion.nav)`
-  background-color: #ffffff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 0.5rem 0;
+  background-color: #1a1a2e;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  padding: 0.75rem 0;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -29,6 +29,7 @@ const NavContainer = styled.div`
 const Logo = styled(motion.img)`
   height: 50px;
   cursor: pointer;
+  filter: brightness(1.2);
 `;
 
 const NavLinks = styled(motion.ul)`
@@ -43,11 +44,11 @@ const NavLinks = styled(motion.ul)`
 `;
 
 const NavItem = styled(motion.li)`
-  margin: 0 1rem;
+  margin: 0 1.25rem;
 `;
 
 const StyledNavLink = styled(NavLink)`
-  color: #333;
+  color: #e6e6ff;
   text-decoration: none;
   font-weight: 500;
   transition: all 0.3s ease;
@@ -56,17 +57,17 @@ const StyledNavLink = styled(NavLink)`
 
   &:hover,
   &.active {
-    color: #007bff;
+    color: #4f9cff;
   }
 
   &::after {
-    content: "";
+    content: '';
     position: absolute;
     width: 100%;
     height: 2px;
     bottom: 0;
     left: 0;
-    background-color: #007bff;
+    background-color: #4f9cff;
     transform: scaleX(0);
     transition: transform 0.3s ease;
   }
@@ -88,12 +89,12 @@ const IconButton = styled(motion.button)`
   cursor: pointer;
   font-size: 1.5rem;
   margin-left: 1rem;
-  color: #333;
+  color: #e6e6ff;
   transition: all 0.3s ease;
   position: relative;
 
   &:hover {
-    color: #007bff;
+    color: #4f9cff;
   }
 `;
 
@@ -111,7 +112,7 @@ const MobileMenu = styled(motion.div)`
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: rgba(26, 26, 46, 0.98);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -123,35 +124,38 @@ const ProfileDropdown = styled(motion.div)`
   position: absolute;
   top: 100%;
   right: 0;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  background-color: #1a1a2e;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   padding: 1rem;
-  min-width: 200px;
+  min-width: 220px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
 const DropdownItem = styled(motion.div)`
-  padding: 0.5rem;
+  padding: 0.75rem;
   display: flex;
   align-items: center;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  color: #333;
+  transition: all 0.3s ease;
+  color: #e6e6ff;
+  border-radius: 8px;
 
   &:hover {
-    background-color: #f0f0f0;
-    color: #007bff;
+    background-color: rgba(79, 156, 255, 0.1);
+    color: #4f9cff;
   }
 
   svg {
-    margin-right: 0.5rem;
+    margin-right: 0.75rem;
+    font-size: 1.2rem;
   }
 `;
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(localStorage.getItem('user'));
   const location = useLocation();
 
   useEffect(() => {
@@ -159,9 +163,9 @@ const Navbar = () => {
   }, [location]);
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    window.location.href = "/login";
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    window.location.href = '/login';
   };
 
   const navVariants = {
@@ -169,7 +173,7 @@ const Navbar = () => {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { type: "spring", stiffness: 300, damping: 30 },
+      transition: { type: 'spring', stiffness: 300, damping: 30 },
     },
   };
 
@@ -184,137 +188,136 @@ const Navbar = () => {
       opacity: 1,
       scale: 1,
       y: 0,
-      transition: { type: "spring", stiffness: 500, damping: 30 },
+      transition: { type: 'spring', stiffness: 500, damping: 30 },
     },
   };
 
   const mobileMenuVariants = {
-    hidden: { opacity: 0, x: "100%" },
-    visible: { opacity: 1, x: 0, transition: { type: "tween", duration: 0.3 } },
+    hidden: { opacity: 0, x: '100%' },
+    visible: { opacity: 1, x: 0, transition: { type: 'tween', duration: 0.3 } },
   };
-  return user && user.role === "admin" ? (
+
+  return user && user.role === 'admin' ? (
     <>
-      <div className="text-end">
-        {/* logout button */}
+      <div className='text-end'>
         <button
-          className="btn btn-outline-secondary"
-          onClick={() => {
-            localStorage.removeItem("user");
-            localStorage.removeItem("token");
-            window.location.href = "/login";
-          }}
-        >
+          className='btn btn-outline-primary'
+          onClick={handleLogout}>
           Logout
         </button>
       </div>
     </>
   ) : (
-    <StyledNavbar initial="hidden" animate="visible" variants={navVariants}>
+    <StyledNavbar
+      initial='hidden'
+      animate='visible'
+      variants={navVariants}>
       <NavContainer>
-        <Link to="/landingpage">
+        <Link to='/landingpage'>
           <Logo
-            src="./../assets/icons/GMlogo.png"
-            alt="Gadget Mart"
+            src='./../assets/icons/GMlogo.png'
+            alt='Gadget Mart'
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           />
         </Link>
         <NavLinks>
           <NavItem variants={itemVariants}>
-            <StyledNavLink exact to="/userdashboard">
+            <StyledNavLink
+              exact
+              to='/userdashboard'>
               Home
             </StyledNavLink>
           </NavItem>
           <NavItem variants={itemVariants}>
-            <StyledNavLink to="/about">About Us</StyledNavLink>
+            <StyledNavLink to='/about'>About Us</StyledNavLink>
           </NavItem>
           <NavItem variants={itemVariants}>
-            <StyledNavLink to="/contact">Contact Us</StyledNavLink>
+            <StyledNavLink to='/contact'>Contact Us</StyledNavLink>
           </NavItem>
         </NavLinks>
         <UserActions>
           {user ? (
-            <div style={{ position: "relative" }}>
+            <div style={{ position: 'relative' }}>
               <IconButton
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-              >
+                onClick={() => setDropdownOpen(!dropdownOpen)}>
                 <Icon
-                  icon={dropdownOpen ? "mdi:chevron-up" : "mdi:chevron-down"}
+                  icon={dropdownOpen ? 'mdi:chevron-up' : 'mdi:chevron-down'}
                 />
-                <Icon icon="mdi:account-circle" style={{ marginLeft: "5px" }} />
+                <Icon
+                  icon='mdi:account-circle'
+                  style={{ marginLeft: '5px' }}
+                />
               </IconButton>
               <AnimatePresence>
                 {dropdownOpen && (
                   <ProfileDropdown
-                    initial="hidden"
-                    animate="visible"
-                    exit="hidden"
-                    variants={dropdownVariants}
-                  >
+                    initial='hidden'
+                    animate='visible'
+                    exit='hidden'
+                    variants={dropdownVariants}>
                     <DropdownItem whileHover={{ x: 5 }}>
                       <Link
-                        to="/profile"
+                        to='/profile'
                         style={{
-                          color: "inherit",
-                          textDecoration: "none",
-                          display: "flex",
-                          alignItems: "center",
-                          width: "100%",
-                        }}
-                      >
-                        <Icon icon="mdi:account" />
+                          color: 'inherit',
+                          textDecoration: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          width: '100%',
+                        }}>
+                        <Icon icon='mdi:account' />
                         Profile
                       </Link>
                     </DropdownItem>
                     <DropdownItem whileHover={{ x: 5 }}>
                       <Link
-                        to="/cart"
+                        to='/cart'
                         style={{
-                          color: "inherit",
-                          textDecoration: "none",
-                          display: "flex",
-                          alignItems: "center",
-                          width: "100%",
-                        }}
-                      >
-                        <Icon icon="mdi:cart" />
+                          color: 'inherit',
+                          textDecoration: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          width: '100%',
+                        }}>
+                        <Icon icon='mdi:cart' />
                         Cart
                       </Link>
                     </DropdownItem>
                     <DropdownItem whileHover={{ x: 5 }}>
                       <Link
-                        to="/favourites"
+                        to='/favourites'
                         style={{
-                          color: "inherit",
-                          textDecoration: "none",
-                          display: "flex",
-                          alignItems: "center",
-                          width: "100%",
-                        }}
-                      >
-                        <Icon icon="mdi:heart" />
+                          color: 'inherit',
+                          textDecoration: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          width: '100%',
+                        }}>
+                        <Icon icon='mdi:heart' />
                         Favourites
                       </Link>
                     </DropdownItem>
                     <DropdownItem whileHover={{ x: 5 }}>
                       <Link
-                        to="/orderlist"
+                        to='/orderlist'
                         style={{
-                          color: "inherit",
-                          textDecoration: "none",
-                          display: "flex",
-                          alignItems: "center",
-                          width: "100%",
-                        }}
-                      >
-                        <Icon icon="mdi:order-bool-ascending" />
+                          color: 'inherit',
+                          textDecoration: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          width: '100%',
+                        }}>
+                        <Icon icon='mdi:order-bool-ascending' />
                         My Orders
                       </Link>
                     </DropdownItem>
-                    <DropdownItem whileHover={{ x: 5 }} onClick={handleLogout}>
-                      <Icon icon="mdi:logout" />
+                    <DropdownItem
+                      whileHover={{ x: 5 }}
+                      onClick={handleLogout}>
+                      <Icon icon='mdi:logout' />
                       Logout
                     </DropdownItem>
                   </ProfileDropdown>
@@ -323,10 +326,14 @@ const Navbar = () => {
             </div>
           ) : (
             <>
-              <Link to="/login" className="btn btn-outline-primary me-2">
+              <Link
+                to='/login'
+                className='btn btn-outline-primary me-2'>
                 Login
               </Link>
-              <Link to="/register" className="btn btn-primary">
+              <Link
+                to='/register'
+                className='btn btn-primary'>
                 Register
               </Link>
             </>
@@ -334,42 +341,37 @@ const Navbar = () => {
           <MobileMenuButton
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <Icon icon={mobileMenuOpen ? "mdi:close" : "mdi:menu"} />
+            whileTap={{ scale: 0.9 }}>
+            <Icon icon={mobileMenuOpen ? 'mdi:close' : 'mdi:menu'} />
           </MobileMenuButton>
         </UserActions>
       </NavContainer>
       <AnimatePresence>
         {mobileMenuOpen && (
           <MobileMenu
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            variants={mobileMenuVariants}
-          >
+            initial='hidden'
+            animate='visible'
+            exit='hidden'
+            variants={mobileMenuVariants}>
             <NavItem variants={itemVariants}>
               <StyledNavLink
                 exact
-                to="/"
-                onClick={() => setMobileMenuOpen(false)}
-              >
+                to='/'
+                onClick={() => setMobileMenuOpen(false)}>
                 Home
               </StyledNavLink>
             </NavItem>
             <NavItem variants={itemVariants}>
               <StyledNavLink
-                to="/about"
-                onClick={() => setMobileMenuOpen(false)}
-              >
+                to='/about'
+                onClick={() => setMobileMenuOpen(false)}>
                 About Us
               </StyledNavLink>
             </NavItem>
             <NavItem variants={itemVariants}>
               <StyledNavLink
-                to="/contact"
-                onClick={() => setMobileMenuOpen(false)}
-              >
+                to='/contact'
+                onClick={() => setMobileMenuOpen(false)}>
                 Contact Us
               </StyledNavLink>
             </NavItem>
