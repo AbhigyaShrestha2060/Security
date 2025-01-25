@@ -397,9 +397,9 @@ const Login = () => {
   };
 
   return (
-    <StyledLoginContainer>
+    <StyledLoginContainer className='flex items-center justify-center min-h-screen'>
       <div className='blur-overlay items-center' />
-      <div className='relative min-h-screen flex items-center justify-center p-4'>
+      <div className='relative flex items-center justify-center p-4 w-full max-w-md'>
         <StyledCard>
           <Spin
             spinning={loading}
