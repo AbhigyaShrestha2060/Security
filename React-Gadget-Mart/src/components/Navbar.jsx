@@ -1,8 +1,9 @@
 import { Icon } from '@iconify/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import AdminNavbar from './AdminNavbar';
 
 const StyledNavbar = styled(motion.nav)`
   background-color: #1a1a2e;
@@ -157,6 +158,7 @@ const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const user = JSON.parse(localStorage.getItem('user'));
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -199,13 +201,7 @@ const Navbar = () => {
 
   return user && user.role === 'admin' ? (
     <>
-      <div className='text-end'>
-        <button
-          className='btn btn-outline-primary'
-          onClick={handleLogout}>
-          Logout
-        </button>
-      </div>
+      <AdminNavbar />
     </>
   ) : (
     <StyledNavbar

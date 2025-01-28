@@ -861,7 +861,7 @@ const Homepage = () => {
           {selectedGadget && (
             <>
               <Image
-                src={`http://localhost:5000/products/${selectedGadget.productImage}`}
+                src={`https://localhost:5000/products/${selectedGadget.productImage}`}
                 alt={selectedGadget.productName}
                 style={{ width: '100%', marginBottom: '16px' }}
               />

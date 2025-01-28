@@ -1,297 +1,102 @@
 import {
-  EyeInvisibleOutlined,
-  EyeTwoTone,
-  GoogleOutlined,
-  KeyOutlined,
-  LockOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+  Google,
+  Key,
+  Lock,
+  Mail,
+  Visibility,
+  VisibilityOff,
+} from '@mui/icons-material';
 import {
   Alert,
+  Box,
   Button,
-  Card,
-  Form,
-  Input,
-  Modal,
-  Spin,
+  CircularProgress,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  IconButton,
+  InputAdornment,
+  Paper,
+  styled,
+  TextField,
   Typography,
-} from 'antd';
+  useTheme,
+} from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import React, { useEffect, useState } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import { loginUserApi, verifyMfaCodeApi } from '../../Apis/api';
-
-const { Title, Text, Paragraph } = Typography;
 
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_DURATION = 15 * 60 * 1000;
 
-const COLORS = {
-  primary: '#1a1a2e',
-  secondary: '#4f9cff',
-  accent: '#60a5fa',
-  background: '#0f172a',
-  text: '#f1f5f9',
-  white: '#1e293b',
-  grey: '#334155',
-  error: '#ef4444',
-  warning: '#f59e0b',
-  darkGrey: '#64748b',
-  inputBg: '#1a1a2e',
-  borderColor: '#334155',
-};
+// Custom styled components
+const StyledContainer = styled(Container)(({ theme }) => ({
+  minHeight: '100vh',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.background.default} 100%)`,
+  padding: theme.spacing(3),
+  position: 'relative',
+  '&::before, &::after': {
+    content: '""',
+    position: 'absolute',
+    width: '24rem',
+    height: '24rem',
+    borderRadius: '50%',
+    background: alpha(theme.palette.primary.main, 0.1),
+    filter: 'blur(60px)',
+    animation: 'pulse 4s infinite',
+  },
+  '&::before': {
+    left: '-3rem',
+    top: '-3rem',
+  },
+  '&::after': {
+    right: '-3rem',
+    bottom: '-3rem',
+    animationDelay: '1s',
+  },
+  '@keyframes pulse': {
+    '0%': { opacity: 0.5 },
+    '50%': { opacity: 0.8 },
+    '100%': { opacity: 0.5 },
+  },
+}));
 
-const StyledLoginContainer = styled.div`
-  min-height: 100vh;
-  position: relative;
-  background: linear-gradient(
-    135deg,
-    ${COLORS.primary} 0%,
-    ${COLORS.background} 100%
-  );
-
-  .blur-overlay {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-
-    &::before,
-    &::after {
-      content: '';
-      position: absolute;
-      width: 24rem;
-      height: 24rem;
-      border-radius: 50%;
-      background: rgba(79, 156, 255, 0.1);
-      filter: blur(60px);
-    }
-
-    &::before {
-      left: -3rem;
-      top: -3rem;
-      animation: pulse 4s infinite;
-    }
-
-    &::after {
-      right: -3rem;
-      bottom: -3rem;
-      animation: pulse 4s infinite 1s;
-    }
-  }
-
-  @keyframes pulse {
-    0% {
-      opacity: 0.5;
-    }
-    50% {
-      opacity: 0.8;
-    }
-    100% {
-      opacity: 0.5;
-    }
-  }
-`;
-
-const StyledCard = styled(Card)`
-  width: 100%;
-  max-width: 28rem;
-  backdrop-filter: blur(16px);
-  background: rgba(30, 41, 59, 0.8);
-  border-radius: 1rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(79, 156, 255, 0.2);
-
-  .ant-card-body {
-    padding: 2rem;
-  }
-
-  .ant-typography {
-    color: ${COLORS.text};
-
-    &.ant-typography-secondary {
-      color: ${COLORS.darkGrey};
-    }
-  }
-
-  .ant-form-item-label > label {
-    color: ${COLORS.text};
-  }
-
-  .ant-input-affix-wrapper {
-    background: ${COLORS.inputBg};
-    border-color: ${COLORS.borderColor};
-
-    &:hover,
-    &:focus,
-    &-focused {
-      border-color: ${COLORS.secondary};
-      box-shadow: 0 0 0 2px rgba(79, 156, 255, 0.2);
-    }
-
-    input {
-      background: transparent;
-      color: ${COLORS.text};
-
-      &::placeholder {
-        color: ${COLORS.darkGrey};
-      }
-    }
-
-    .anticon {
-      color: ${COLORS.darkGrey};
-
-      &:hover {
-        color: ${COLORS.secondary};
-      }
-    }
-  }
-
-  .ant-btn {
-    &.login-button {
-      background: linear-gradient(45deg, ${COLORS.secondary}, ${COLORS.accent});
-      border: none;
-      height: 3rem;
-      font-weight: 500;
-      transition: all 0.3s ease;
-
-      &:hover {
-        background: linear-gradient(
-          45deg,
-          ${COLORS.accent},
-          ${COLORS.secondary}
-        );
-        transform: translateY(-1px);
-      }
-
-      &:disabled {
-        background: ${COLORS.darkGrey};
-        opacity: 0.5;
-      }
-    }
-
-    &.google-button {
-      background: ${COLORS.inputBg};
-      border-color: ${COLORS.borderColor};
-      color: ${COLORS.text};
-      height: 3rem;
-      transition: all 0.3s ease;
-
-      &:hover {
-        background: ${COLORS.grey};
-        border-color: ${COLORS.secondary};
-      }
-    }
-  }
-
-  .divider {
-    border-color: ${COLORS.borderColor};
-    margin: 2rem 0;
-
-    .divider-text {
-      color: ${COLORS.text};
-      background: ${COLORS.white};
-      padding: 0 1rem;
-    }
-  }
-`;
-
-const StyledModal = styled(Modal)`
-  .ant-modal-content {
-    background: ${COLORS.white};
-
-    .ant-modal-header {
-      background: ${COLORS.white};
-      border-bottom: 1px solid ${COLORS.borderColor};
-
-      .ant-modal-title {
-        color: ${COLORS.text};
-      }
-    }
-
-    .ant-modal-body {
-      .ant-form-item-label > label {
-        color: ${COLORS.text};
-      }
-
-      .ant-input {
-        background: ${COLORS.inputBg};
-        border-color: ${COLORS.borderColor};
-        color: ${COLORS.text};
-
-        &:hover,
-        &:focus {
-          border-color: ${COLORS.secondary};
-          box-shadow: 0 0 0 2px rgba(79, 156, 255, 0.2);
-        }
-
-        &::placeholder {
-          color: ${COLORS.darkGrey};
-        }
-      }
-
-      .ant-btn {
-        background: ${COLORS.secondary};
-        border: none;
-
-        &:hover {
-          background: ${COLORS.accent};
-        }
-
-        &:disabled {
-          background: ${COLORS.darkGrey};
-          opacity: 0.5;
-        }
-      }
-    }
-
-    .ant-modal-close {
-      color: ${COLORS.text};
-
-      &:hover {
-        color: ${COLORS.secondary};
-      }
-    }
-  }
-`;
-
-const StyledAlert = styled(Alert)`
-  background: ${COLORS.inputBg};
-  border: 1px solid ${COLORS.borderColor};
-  border-radius: 0.5rem;
-  margin-bottom: 1.5rem;
-
-  .ant-alert-message {
-    color: ${(props) =>
-      props.type === 'error' ? COLORS.error : COLORS.warning};
-  }
-
-  .ant-alert-description {
-    color: ${COLORS.text};
-  }
-
-  .ant-alert-close-icon {
-    color: ${COLORS.text};
-
-    &:hover {
-      color: ${COLORS.secondary};
-    }
-  }
-`;
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(4),
+  width: '100%',
+  maxWidth: '28rem',
+  backdropFilter: 'blur(16px)',
+  backgroundColor: alpha(theme.palette.background.paper, 0.8),
+  borderRadius: theme.spacing(2),
+  boxShadow: theme.shadows[10],
+  border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+}));
 
 const Login = () => {
-  const [form] = Form.useForm();
-  const [otpForm] = Form.useForm();
+  const theme = useTheme();
   const navigate = useNavigate();
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [captchaToken, setCaptchaToken] = useState(null);
   const [loginAttempts, setLoginAttempts] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   const [lockoutEndTime, setLockoutEndTime] = useState(null);
   const [userId, setUserId] = useState(null);
   const [isOtpModalVisible, setIsOtpModalVisible] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    otp: '',
+  });
 
   useEffect(() => {
     const lockedUntil = localStorage.getItem('accountLockedUntil');
@@ -318,18 +123,8 @@ const Login = () => {
     }
   };
 
-  const validateEmail = (_, value) => {
-    if (!value) {
-      return Promise.reject('Please enter your email');
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(value)) {
-      return Promise.reject('Please enter a valid email address');
-    }
-    return Promise.resolve();
-  };
-
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (isLocked) {
       setError('Account is temporarily locked. Please try again later.');
       return;
@@ -345,8 +140,8 @@ const Login = () => {
       setError('');
 
       const response = await loginUserApi({
-        email: values.email,
-        password: values.password,
+        email: formData.email,
+        password: formData.password,
         captchaToken,
       });
 
@@ -369,14 +164,15 @@ const Login = () => {
     }
   };
 
-  const handleOtpSubmit = async (values) => {
+  const handleOtpSubmit = async (e) => {
+    e.preventDefault();
     try {
       setLoading(true);
       setError('');
 
       const response = await verifyMfaCodeApi({
         userId: userId,
-        otp: values.otp,
+        otp: formData.otp,
       });
 
       if (response.status === 200) {
@@ -397,156 +193,174 @@ const Login = () => {
   };
 
   return (
-    <StyledLoginContainer className='flex items-center justify-center min-h-screen'>
-      <div className='blur-overlay items-center' />
-      <div className='relative flex items-center justify-center p-4 w-full max-w-md'>
-        <StyledCard>
-          <Spin
-            spinning={loading}
-            size='large'>
-            <div className='text-center mb-8'>
-              <KeyOutlined
-                style={{
-                  fontSize: '3rem',
-                  color: COLORS.secondary,
-                  marginBottom: '1rem',
-                }}
-              />
-              <Title level={2}>Welcome Back</Title>
-              <Paragraph type='secondary'>
-                Enter your credentials to access your account
-              </Paragraph>
-            </div>
+    <StyledContainer>
+      <StyledPaper elevation={24}>
+        {loading && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 1,
+            }}>
+            <CircularProgress />
+          </Box>
+        )}
+        <Box sx={{ opacity: loading ? 0.5 : 1 }}>
+          <Box sx={{ textAlign: 'center', mb: 4 }}>
+            <Key sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+            <Typography
+              variant='h4'
+              component='h1'
+              gutterBottom>
+              Welcome Back
+            </Typography>
+            <Typography
+              variant='body1'
+              color='text.secondary'>
+              Enter your credentials to access your account
+            </Typography>
+          </Box>
 
-            {error && (
-              <StyledAlert
-                message='Error'
-                description={error}
-                type='error'
-                showIcon
-                closable
-              />
-            )}
+          {error && (
+            <Alert
+              severity='error'
+              sx={{ mb: 3 }}>
+              {error}
+            </Alert>
+          )}
 
-            {isLocked && lockoutEndTime && (
-              <StyledAlert
-                message='Account Temporarily Locked'
-                description={`Too many failed attempts. Please try again after ${lockoutEndTime.toLocaleTimeString()}`}
-                type='warning'
-                showIcon
-              />
-            )}
+          {isLocked && lockoutEndTime && (
+            <Alert
+              severity='warning'
+              sx={{ mb: 3 }}>
+              Account Temporarily Locked. Try again after{' '}
+              {lockoutEndTime.toLocaleTimeString()}
+            </Alert>
+          )}
 
-            <Form
-              form={form}
-              onFinish={handleSubmit}
-              layout='vertical'
-              requiredMark={false}
-              size='large'>
-              <Form.Item
-                name='email'
-                rules={[{ validator: validateEmail }]}>
-                <Input
-                  prefix={<UserOutlined />}
-                  placeholder='Email'
-                  disabled={isLocked}
-                  autoComplete='email'
-                />
-              </Form.Item>
-
-              <Form.Item
-                name='password'
-                rules={[
-                  { required: true, message: 'Please enter your password' },
-                ]}>
-                <Input.Password
-                  prefix={<LockOutlined />}
-                  placeholder='Password'
-                  disabled={isLocked}
-                  iconRender={(visible) =>
-                    visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-                  }
-                  autoComplete='current-password'
-                />
-              </Form.Item>
-
-              <div className='flex justify-center mb-4'>
-                <ReCAPTCHA
-                  sitekey='6LeqWbMqAAAAAJsPdQqXcEX6M-68zQNUex8sYCgA'
-                  onChange={setCaptchaToken}
-                  theme='dark'
-                />
-              </div>
-
-              <Form.Item>
-                <Button
-                  type='primary'
-                  htmlType='submit'
-                  block
-                  disabled={isLocked || !captchaToken}
-                  className='login-button'>
-                  Log In
-                </Button>
-              </Form.Item>
-
-              <div className='divider'>
-                <div className='relative flex justify-center'>
-                  <span className='divider-text'>Or continue with</span>
-                </div>
-              </div>
-
-              <Button
-                icon={<GoogleOutlined />}
-                block
-                className='google-button'>
-                Google
-              </Button>
-            </Form>
-          </Spin>
-        </StyledCard>
-      </div>
-
-      <StyledModal
-        title='Enter OTP'
-        open={isOtpModalVisible}
-        footer={null}
-        onCancel={() => setIsOtpModalVisible(false)}
-        maskClosable={false}>
-        <Form
-          form={otpForm}
-          onFinish={handleOtpSubmit}
-          layout='vertical'>
-          <Form.Item
-            name='otp'
-            rules={[
-              { required: true, message: 'Please enter the OTP' },
-              { len: 6, message: 'OTP must be 6 digits' },
-            ]}>
-            <Input
-              placeholder='Enter 6-digit OTP'
-              maxLength={6}
+          <form onSubmit={handleSubmit}>
+            <TextField
+              fullWidth
+              label='Email'
+              variant='outlined'
+              margin='normal'
+              disabled={isLocked}
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <Mail color='action' />
+                  </InputAdornment>
+                ),
+              }}
             />
-          </Form.Item>
-          <Form.Item>
-            <Button
-              type='primary'
-              htmlType='submit'
-              block
-              loading={loading}>
-              Verify OTP
-            </Button>
-          </Form.Item>
-        </Form>
-      </StyledModal>
 
-      <style
-        jsx
-        global>{`
-        .recaptcha-dark {
-          filter: invert(0.9) hue-rotate(180deg);
-        }
-      `}</style>
-    </StyledLoginContainer>
+            <TextField
+              fullWidth
+              label='Password'
+              variant='outlined'
+              margin='normal'
+              type={showPassword ? 'text' : 'password'}
+              disabled={isLocked}
+              value={formData.password}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <Lock color='action' />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position='end'>
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge='end'>
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <Box sx={{ display: 'flex', justifyContent: 'center', my: 3 }}>
+              <ReCAPTCHA
+                sitekey='6LeqWbMqAAAAAJsPdQqXcEX6M-68zQNUex8sYCgA'
+                onChange={setCaptchaToken}
+                theme='dark'
+              />
+            </Box>
+
+            <Button
+              fullWidth
+              variant='contained'
+              size='large'
+              type='submit'
+              disabled={isLocked || !captchaToken}
+              sx={{
+                mt: 2,
+                height: 48,
+                background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                '&:hover': {
+                  background: `linear-gradient(45deg, ${theme.palette.secondary.main}, ${theme.palette.primary.main})`,
+                },
+              }}>
+              Log In
+            </Button>
+
+            <Divider sx={{ my: 3 }}>
+              <Typography
+                variant='body2'
+                color='text.secondary'>
+                Or continue with
+              </Typography>
+            </Divider>
+
+            <Button
+              fullWidth
+              variant='outlined'
+              size='large'
+              startIcon={<Google />}
+              sx={{ height: 48 }}>
+              Google
+            </Button>
+          </form>
+        </Box>
+      </StyledPaper>
+
+      <Dialog
+        open={isOtpModalVisible}
+        onClose={() => setIsOtpModalVisible(false)}
+        maxWidth='xs'
+        fullWidth>
+        <DialogTitle>Enter OTP</DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            label='OTP Code'
+            variant='outlined'
+            margin='normal'
+            value={formData.otp}
+            onChange={(e) => setFormData({ ...formData, otp: e.target.value })}
+            inputProps={{ maxLength: 6 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsOtpModalVisible(false)}>Cancel</Button>
+          <Button
+            onClick={handleOtpSubmit}
+            variant='contained'>
+            Verify OTP
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </StyledContainer>
   );
 };
 
