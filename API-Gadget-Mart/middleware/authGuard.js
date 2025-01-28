@@ -1,9 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { activityLoggerMiddleware } = require('./LogActivity');
 const authGuard = (req, res, next) => {
-  // check incoming data
-
-  // get authorization data from headers
   const authHeader = req.headers.authorization;
 
   // check or validate
@@ -29,7 +26,7 @@ const authGuard = (req, res, next) => {
   try {
     const decodeUserData = jwt.verify(token, 'SECRET');
     req.user = decodeUserData; //user info : id onlyf
-
+    
     next();
   } catch (error) {
     return res.status(400).json({
@@ -37,16 +34,10 @@ const authGuard = (req, res, next) => {
       message: 'Not Authenticated',
     });
   }
-
-  // if verified : next (function in controller)
-  // if not verified : not auth
 };
 
 // Admin guard
 const adminGuard = (req, res, next) => {
-  // check incoming data
-
-  // get authorization data from headers
   const authHeader = req.headers.authorization;
 
   // check or validate

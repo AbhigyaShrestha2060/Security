@@ -93,6 +93,7 @@ const createUser = async (req, res) => {
 // Login User Controller
 const loginUser = async (req, res) => {
   const { email, password, captchaToken } = req.body;
+  console.log(email, password, captchaToken);
 
   if (!email || !password || !captchaToken) {
     return res.status(400).json({
@@ -277,7 +278,10 @@ const verifyOTP = async (req, res) => {
     }
 
     // OTP is valid, generate JWT token
-    const token = jwt.sign({ id: userId }, process.env.JWT_SECRET);
+    const token = jwt.sign(
+      { id: userId, isAdmin: user.role === 'admin' },
+      process.env.JWT_SECRET
+    );
 
     // Clear the used OTP
     await userModel.findByIdAndUpdate(userId, {

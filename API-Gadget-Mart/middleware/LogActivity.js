@@ -1,30 +1,28 @@
-import Activity from '../models/LogActivityModel.js';
-const logActivity = async (
-  userId,
-  action,
-  description = null,
-  ipAddress = null
-) => {
+const Log = require('../models/LogActivityModel');
+const activityLoggerMiddleware = async (req, res, next) => {
+  const logEntry = new Log({
+    username: req.user
+      ? req.user.fullname || req.user.email || 'Unknown User'
+      : 'Unknown User',
+    url: req.originalUrl,
+    method: req.method,
+    role: req.user?.role || 'User', // Dynamically set role
+    status: res.statusCode,
+    time: new Date(),
+    headers: req.headers, // Include headers
+    device: req.headers['user-agent'], // Include device information
+    ipAddress: req.ip, // Include IP address
+  });
+
   try {
-    const activity = new Activity({
-      userId,
-      action,
-      description,
-      ipAddress,
-      timestamp: new Date(),
-    });
-    await activity.save();
+    await logEntry.save();
   } catch (error) {
-    console.error('Error logging activity:', error);
+    console.error('Error logging request:', error.message);
   }
+
+  next();
 };
 
-export const activityLoggerMiddleware = async (req, res, next) => {
-  const userId = req.user ? req.user.id : 'Anonymous'; // Extract user ID if authenticated
-  const action = `${req.method} ${req.originalUrl}`;
-  const description = req.body.description || null;
-  const ipAddress = req.ip || req.connection.remoteAddress; // Get the user's IP address
-
-  await logActivity(userId, action, description, ipAddress);
-  next();
+module.exports = {
+  activityLoggerMiddleware,
 };

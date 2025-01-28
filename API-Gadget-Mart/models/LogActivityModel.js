@@ -1,24 +1,20 @@
 const mongoose = require('mongoose');
 
-const activitySchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+const logSchema = new mongoose.Schema(
+  {
+    username: String,
+    url: String,
+    method: String,
+    role: String,
+    status: String,
+    time: Date,
+    headers: Object,
+    device: String,
+    ipAddress: String,
   },
-  action: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-  },
-  ipAddress: {
-    type: String, // Store the IP address
-  },
-  timestamp: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('Activity', activitySchema);
+const Log = mongoose.model('Log', logSchema);
+
+module.exports = Log;
