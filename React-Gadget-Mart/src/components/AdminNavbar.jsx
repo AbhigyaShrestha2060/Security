@@ -1,114 +1,196 @@
-import React from "react";
-import { Link, NavLink } from "react-router-dom";
-import "./Navbar.css";
+import {
+  Add as AddIcon,
+  Dashboard as DashboardIcon,
+  ExitToApp as LogoutIcon,
+  Menu as MenuIcon,
+  Timeline as TimelineIcon,
+} from '@mui/icons-material';
+import {
+  AppBar,
+  Box,
+  Button,
+  Divider,
+  Drawer,
+  IconButton,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Toolbar,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AdminNavbar = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const navItems = [
+    { text: 'Dashboard', path: '/admin/dashboard', icon: <DashboardIcon /> },
+    { text: 'Add Gadget', path: '/admin/add-gadget', icon: <AddIcon /> },
+    { text: 'Activity', path: '/admin/activity-logs', icon: <TimelineIcon /> },
+  ];
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    handleMenuClose();
+    // Add your logout logic here
+    alert('Logout logic goes here');
+  };
+
+  const handleNavigation = (path) => {
+    navigate(path);
+    if (isMobile) {
+      setMobileOpen(false);
+    }
+  };
+
+  const drawer = (
+    <Box sx={{ width: 250 }}>
+      <Box sx={{ p: 2 }}>
+        <Typography
+          variant='h6'
+          component='div'
+          sx={{ flexGrow: 1 }}>
+          Admin Panel
+        </Typography>
+      </Box>
+      <Divider />
+      <List>
+        {navItems.map((item) => (
+          <ListItem
+            button
+            key={item.text}
+            onClick={() => handleNavigation(item.path)}
+            sx={{
+              '&:hover': {
+                backgroundColor: theme.palette.primary.light,
+                '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
+                  color: theme.palette.primary.contrastText,
+                },
+              },
+            }}>
+            <ListItemIcon sx={{ color: theme.palette.primary.main }}>
+              {item.icon}
+            </ListItemIcon>
+            <ListItemText primary={item.text} />
+          </ListItem>
+        ))}
+        <ListItem
+          button
+          onClick={handleLogout}
+          sx={{
+            '&:hover': {
+              backgroundColor: theme.palette.error.light,
+              '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
+                color: theme.palette.error.contrastText,
+              },
+            },
+          }}>
+          <ListItemIcon sx={{ color: theme.palette.error.main }}>
+            <LogoutIcon />
+          </ListItemIcon>
+          <ListItemText primary='Logout' />
+        </ListItem>
+      </List>
+    </Box>
+  );
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-light">
-        <div className="container-fluid">
-          <Link className="navbar-brand" to="/">
-            <img
-              src="./../assets/icons/GMlogo.png"
-              alt="Icon"
-              className="App-logo"
-            />
-          </Link>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul className="navbar-nav mb-2 mb-lg-0 mx-auto">
-              <li className="nav-item">
-                <NavLink
-                  className="nav-link"
-                  activeClassName="active"
-                  exact
-                  to="/"
-                >
-                  Home
-                </NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink
-                  className="nav-link"
-                  activeClassName="active"
-                  to="/about"
-                >
-                  Products
-                </NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink
-                  className="nav-link"
-                  activeClassName="active"
-                  to="/contact"
-                >
-                  Users
-                </NavLink>
-              </li>
-            </ul>
-            {user ? (
-              <div className="d-flex align-items-center">
-                <form className="d-flex mx-3" role="search">
-                  <input
-                    className="form-control me-2"
-                    type="search"
-                    placeholder="What are you looking for?"
-                    aria-label="Search"
-                  />
-                  <button className="btn btn-outline-success" type="submit">
-                    <i className="fas fa-search"></i>
-                  </button>
-                </form>
+      <AppBar
+        position='static'
+        elevation={3}>
+        <Toolbar>
+          {isMobile && (
+            <IconButton
+              color='inherit'
+              aria-label='open drawer'
+              edge='start'
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2 }}>
+              <MenuIcon />
+            </IconButton>
+          )}
 
-                <div className="dropdown">
-                  <button
-                    className="btn btn-outline-secondary dropdown-toggle"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <i className="fas fa-user-circle"></i>
-                  </button>
+          <Typography
+            variant='h6'
+            component='div'
+            sx={{
+              flexGrow: 1,
+              cursor: 'pointer',
+              '&:hover': {
+                opacity: 0.8,
+              },
+            }}
+            onClick={() => handleNavigation('/dashboard')}>
+            Admin Panel
+          </Typography>
 
-                  <li>
-                    <button
-                      className="dropdown-item"
-                      onClick={() => {
-                        localStorage.removeItem("user");
-                        localStorage.removeItem("token");
-                        window.location.href = "/login";
-                      }}
-                    >
-                      Logout
-                    </button>
-                  </li>
-                </div>
-              </div>
-            ) : (
-              <div className="d-flex">
-                <Link to="/login" className="btn btn-primary mx-2">
-                  Login
-                </Link>
-                <Link to="/register" className="btn btn-primary ms-2">
-                  Register
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-      </nav>
+          {!isMobile && (
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              {navItems.map((item) => (
+                <Button
+                  key={item.text}
+                  color='inherit'
+                  startIcon={item.icon}
+                  onClick={() => handleNavigation(item.path)}
+                  sx={{
+                    '&:hover': {
+                      backgroundColor: theme.palette.primary.dark,
+                    },
+                  }}>
+                  {item.text}
+                </Button>
+              ))}
+              <Button
+                color='inherit'
+                startIcon={<LogoutIcon />}
+                onClick={handleLogout}
+                sx={{
+                  '&:hover': {
+                    backgroundColor: theme.palette.error.dark,
+                  },
+                }}>
+                Logout
+              </Button>
+            </Box>
+          )}
+        </Toolbar>
+      </AppBar>
+
+      {isMobile && (
+        <Drawer
+          variant='temporary'
+          anchor='left'
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+          sx={{
+            '& .MuiDrawer-paper': { width: 250 },
+          }}>
+          {drawer}
+        </Drawer>
+      )}
     </>
   );
 };

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Creating backend config
 const Api = axios.create({
-  baseURL: 'http://localhost:5500/',
+  baseURL: 'https://localhost:5000/',
   withCredentials: true,
   headers: {
     'Content-Type': 'multipart/form-data',
@@ -119,3 +119,6 @@ export const updateOrderStatusApi = (id, data) =>
 // update carts status
 export const updateCartStatusApi = (data) =>
   Api.put(`/api/cart/status`, data, config);
+
+export const activityLogsApi = () =>
+  Api.get('/api/logactivity/activities', config);

@@ -22,12 +22,12 @@ const app = express();
 
 // Configure CORS
 const corsOptions = {
-  origin: true,
+  origin: [process.env.FRONTEND_URL],
   credentials: true,
   optionSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
-app.use(morgan('dev'));
+app.use(morgan('tiny'));
 // Express JSON configuration
 app.use(express.json());
 
@@ -72,7 +72,7 @@ app.use('/api/product', require('./routes/productRoutes'));
 app.use('/api/order', require('./routes/orderRoutes'));
 app.use('/api/logactivity', require('./routes/LogActivityRoutes'));
 // Define port
-const PORT = process.env.PORT || 5500;
+const PORT = process.env.PORT;
 
 https.createServer(options, app).listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

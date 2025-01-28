@@ -1,41 +1,43 @@
-import "bootstrap/dist/css/bootstrap.min.css";
-import React, { useEffect, useState } from "react";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useEffect, useState } from 'react';
 import {
   Route,
   BrowserRouter as Router,
   Routes,
   useLocation,
-} from "react-router-dom";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+} from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {
   addToCartApi,
   deleteCartApi,
   getAllCartApi,
   updateCartApi,
-} from "./Apis/api";
-import "./App.css";
-import Footer from "./components/Footer";
-import Navbar from "./components/Navbar";
-import AboutUs from "./pages/about_us/AboutUs";
-import AdminDashboard from "./pages/admin_dashboard/AdminDashboard";
-import Cart from "./pages/cart_page/Cart";
-import ContactUs from "./pages/contact_us/ContactUs";
-import Favourites from "./pages/favourites_page/Favourites";
-import ForgotPassword from "./pages/forgot_password/ForgotPassword";
-import Homepage from "./pages/homepage/Homepage";
-import LandingPage from "./pages/landing_page/LandingPage";
-import Login from "./pages/login/Login";
-import OrderList from "./pages/order_list/OrderList";
-import Register from "./pages/register/Register";
-import UpdateProfile from "./pages/update_profile/UpdateProfile";
-import AdminRoutes from "./protected/AdminRoutes";
+} from './Apis/api';
+import './App.css';
+import Footer from './components/Footer';
+import Navbar from './components/Navbar';
+import AboutUs from './pages/about_us/AboutUs';
+import ActivityLogs from './pages/admin/Activitylogs/ActivityLogs';
+import AddGadgetPage from './pages/admin/AddProduct/AddProduct';
+import AdminDashboard from './pages/admin/Dashboard/AdminDashboard';
+import Cart from './pages/cart_page/Cart';
+import ContactUs from './pages/contact_us/ContactUs';
+import Favourites from './pages/favourites_page/Favourites';
+import ForgotPassword from './pages/forgot_password/ForgotPassword';
+import Homepage from './pages/homepage/Homepage';
+import LandingPage from './pages/landing_page/LandingPage';
+import Login from './pages/login/Login';
+import OrderList from './pages/order_list/OrderList';
+import Register from './pages/register/Register';
+import UpdateProfile from './pages/update_profile/UpdateProfile';
+import AdminRoutes from './protected/AdminRoutes';
 
 const App = () => {
   const location = useLocation();
   const [cart, setCart] = useState([]);
 
-  const showFooter = !["/login", "/register"].includes(location.pathname);
+  const showFooter = !['/login', '/register'].includes(location.pathname);
 
   useEffect(() => {
     fetchCart();
@@ -46,7 +48,7 @@ const App = () => {
       const response = await getAllCartApi();
       setCart(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
-      console.error("Error fetching cart:", error);
+      console.error('Error fetching cart:', error);
       setCart([]);
     }
   };
@@ -69,7 +71,7 @@ const App = () => {
       }
       await fetchCart();
     } catch (error) {
-      console.error("Error adding to cart:", error);
+      console.error('Error adding to cart:', error);
     }
   };
 
@@ -78,7 +80,7 @@ const App = () => {
       await updateCartApi(id, { quantity: newQuantity });
       await fetchCart();
     } catch (error) {
-      console.error("Error updating cart:", error);
+      console.error('Error updating cart:', error);
     }
   };
 
@@ -87,28 +89,50 @@ const App = () => {
       await deleteCartApi(id);
       await fetchCart();
     } catch (error) {
-      console.error("Error removing from cart:", error);
+      console.error('Error removing from cart:', error);
     }
   };
 
   return (
-    <div className="App">
+    <div className='App'>
       <Navbar
         cartItemCount={cart.reduce((total, item) => total + item.quantity, 0)}
       />
       <ToastContainer />
       <Routes>
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot_password" element={<ForgotPassword />} />
         <Route
-          path="/"
-          element={<LandingPage cart={cart} addToCart={addToCart} />}
+          path='/register'
+          element={<Register />}
+        />
+        <Route
+          path='/forgot_password'
+          element={<ForgotPassword />}
+        />
+        <Route
+          path='/'
+          element={
+            <LandingPage
+              cart={cart}
+              addToCart={addToCart}
+            />
+          }
         />
         <Route element={<AdminRoutes />}>
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route
+            path='/admin/dashboard'
+            element={<AdminDashboard />}
+          />
+          <Route
+            path='/admin/add-gadget'
+            element={<AddGadgetPage />}
+          />
+          <Route
+            path='/admin/activity-logs'
+            element={<ActivityLogs />}
+          />
         </Route>
         <Route
-          path="/cart"
+          path='/cart'
           element={
             <Cart
               cart={cart}
@@ -117,15 +141,42 @@ const App = () => {
             />
           }
         />
-        <Route path="/favourites" element={<Favourites />} />
-        <Route path="/about" element={<AboutUs />} />
-        <Route path="/profile" element={<UpdateProfile />} />
-        <Route path="/landingpage" element={<LandingPage />} />
-        <Route path="*" element={<div>404 Not Found</div>} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/contact" element={<ContactUs />} />
-        <Route path="/orderlist" element={<OrderList />} />
-        <Route path="/userdashboard" element={<Homepage />} />
+        <Route
+          path='/favourites'
+          element={<Favourites />}
+        />
+        <Route
+          path='/about'
+          element={<AboutUs />}
+        />
+        <Route
+          path='/profile'
+          element={<UpdateProfile />}
+        />
+        <Route
+          path='/landingpage'
+          element={<LandingPage />}
+        />
+        <Route
+          path='*'
+          element={<div>404 Not Found</div>}
+        />
+        <Route
+          path='/login'
+          element={<Login />}
+        />
+        <Route
+          path='/contact'
+          element={<ContactUs />}
+        />
+        <Route
+          path='/orderlist'
+          element={<OrderList />}
+        />
+        <Route
+          path='/userdashboard'
+          element={<Homepage />}
+        />
       </Routes>
       {showFooter && <Footer />}
     </div>
