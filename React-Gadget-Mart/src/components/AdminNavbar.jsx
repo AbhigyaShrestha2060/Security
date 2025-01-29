@@ -51,8 +51,9 @@ const AdminNavbar = () => {
 
   const handleLogout = () => {
     handleMenuClose();
-    // Add your logout logic here
-    alert('Logout logic goes here');
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    window.location.href = '/login';
   };
 
   const handleNavigation = (path) => {

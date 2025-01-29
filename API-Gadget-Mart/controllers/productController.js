@@ -2,10 +2,26 @@ const path = require('path');
 const productModel = require('../models/productModel');
 const Product = require('../models/productModel');
 const fs = require('fs');
+const DOMPurify = require('dompurify');
+
+const sanitizeInput = (input) => DOMPurify.sanitize(input);
+
+const isValidImage = (file) => {
+  const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+  return file && allowedTypes.includes(file.mimetype);
+};
+
+const isValidPrice = (price) => {
+  return !isNaN(price) && parseFloat(price) > 0;
+};
 
 const createProduct = async (req, res) => {
-  const { productName, productPrice, productCategory, productDescription } =
+  let { productName, productPrice, productCategory, productDescription } =
     req.body;
+
+  productName = sanitizeInput(productName);
+  productCategory = sanitizeInput(productCategory);
+  productDescription = sanitizeInput(productDescription);
 
   if (
     !productName ||
@@ -13,21 +29,28 @@ const createProduct = async (req, res) => {
     !productCategory ||
     !productDescription
   ) {
-    return res.status(400).json({
-      success: false,
-      message: 'Please enter all fields',
-    });
+    return res
+      .status(400)
+      .json({ success: false, message: 'All fields are required!' });
   }
 
-  if (!req.files || !req.files.productImage) {
-    return res.status(400).json({
-      success: false,
-      message: 'Image not found',
-    });
+  if (!isValidPrice(productPrice)) {
+    return res
+      .status(400)
+      .json({ success: false, message: 'Invalid price value!' });
+  }
+
+  if (
+    !req.files ||
+    !req.files.productImage ||
+    !isValidImage(req.files.productImage)
+  ) {
+    return res
+      .status(400)
+      .json({ success: false, message: 'Invalid or missing image file!' });
   }
 
   const { productImage } = req.files;
-
   const imageName = `${Date.now()}-${productImage.name}`;
   const imageUploadPath = path.join(
     __dirname,
@@ -52,28 +75,52 @@ const createProduct = async (req, res) => {
       data: product,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Internal Server Error',
-      error,
-    });
+    res
+      .status(500)
+      .json({ success: false, message: 'Internal Server Error', error });
   }
 };
 
 const getAllProducts = async (req, res) => {
   try {
     const allProducts = await productModel.find({});
-    res.status(201).json({
+    res.status(200).json({
       success: true,
       message: 'Products fetched successfully',
       products: allProducts,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Internal Server Error',
-      error,
-    });
+    res
+      .status(500)
+      .json({ success: false, message: 'Internal Server Error', error });
+  }
+};
+
+const deleteProduct = async (req, res) => {
+  try {
+    const product = await productModel.findById(req.params.id);
+    if (!product) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Product not found' });
+    }
+
+    const imagePath = path.join(
+      __dirname,
+      `../public/products/${product.productImage}`
+    );
+    if (fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath);
+    }
+
+    await productModel.findByIdAndDelete(req.params.id);
+    res
+      .status(200)
+      .json({ success: true, message: 'Product Deleted Successfully' });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: 'Internal Server Error', error });
   }
 };
 
@@ -119,80 +166,81 @@ const getSingleProduct = async (req, res) => {
   }
 };
 
-const deleteProduct = async (req, res) => {
-  try {
-    const product = await productModel.findById(req.params.id);
-    if (!product) {
-      return res.status(400).json({
-        success: false,
-        message: 'Product not found',
-      });
-    }
-
-    const imagePath = path.join(
-      __dirname,
-      `../public/products/${product.productImage}`
-    );
-    if (fs.existsSync(imagePath)) {
-      fs.unlinkSync(imagePath);
-    }
-
-    await productModel.findByIdAndDelete(req.params.id);
-    res.status(201).json({
-      success: true,
-      message: 'Product Deleted Successfully',
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Internal Server Error',
-      error,
-    });
-  }
-};
-
 const updateProduct = async (req, res) => {
   try {
-    if (req.files && req.files.productImage) {
-      const { productImage } = req.files;
+    let { productName, productPrice, productCategory, productDescription } =
+      req.body;
 
-      const imageName = `${Date.now()}-${productImage.name}`;
+    productName = sanitizeInput(productName);
+    productCategory = sanitizeInput(productCategory);
+    productDescription = sanitizeInput(productDescription);
+
+    if (
+      !productName ||
+      !productPrice ||
+      !productCategory ||
+      !productDescription
+    ) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'All fields are required!' });
+    }
+
+    if (!isValidPrice(productPrice)) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Invalid price value!' });
+    }
+
+    let imageName;
+    if (
+      req.files &&
+      req.files.productImage &&
+      isValidImage(req.files.productImage)
+    ) {
+      const { productImage } = req.files;
+      imageName = `${Date.now()}-${productImage.name}`;
       const imageUploadPath = path.join(
         __dirname,
         `../public/products/${imageName}`
       );
       await productImage.mv(imageUploadPath);
 
-      req.body.productImage = imageName;
-
       const existingProduct = await productModel.findById(req.params.id);
-      const oldImagePath = path.join(
-        __dirname,
-        `../public/products/${existingProduct.productImage}`
-      );
-      if (fs.existsSync(oldImagePath)) {
-        fs.unlinkSync(oldImagePath);
+      if (existingProduct && existingProduct.productImage) {
+        const oldImagePath = path.join(
+          __dirname,
+          `../public/products/${existingProduct.productImage}`
+        );
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
       }
     }
 
-    req.body.productPrice = parseFloat(req.body.productPrice.replace(/,/g, ''));
+    productPrice = parseFloat(productPrice.replace(/,/g, ''));
+    const updatedProductData = {
+      productName,
+      productPrice,
+      productCategory,
+      productDescription,
+    };
+    if (imageName) updatedProductData.productImage = imageName;
 
     const updatedProduct = await productModel.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updatedProductData,
       { new: true }
     );
-    res.status(201).json({
+    res.status(200).json({
       success: true,
-      message: 'Product updated!',
+      message: 'Product updated successfully',
       product: updatedProduct,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Internal Server Error',
-      error,
-    });
+    res
+      .status(500)
+      .json({ success: false, message: 'Internal Server Error', error });
   }
 };
 

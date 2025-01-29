@@ -24,6 +24,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import DOMPurify from 'dompurify';
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { createProductApi } from '../../../Apis/api';
@@ -59,9 +60,18 @@ const AddGadgetPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const sanitizeInput = (value) => {
+    return DOMPurify.sanitize(value);
+  };
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      const allowedExtensions = ['image/png', 'image/jpeg', 'image/jpg'];
+      if (!allowedExtensions.includes(file.type)) {
+        toast.error('Only .png, .jpg, and .jpeg files are allowed.');
+        return;
+      }
       setFormData({ ...formData, imageFile: file });
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -76,10 +86,13 @@ const AddGadgetPage = () => {
     if (!validateForm()) return;
 
     const submitFormData = new FormData();
-    submitFormData.append('productName', formData.name);
-    submitFormData.append('productPrice', formData.price);
-    submitFormData.append('productCategory', formData.category);
-    submitFormData.append('productDescription', formData.description);
+    submitFormData.append('productName', sanitizeInput(formData.name));
+    submitFormData.append('productPrice', sanitizeInput(formData.price));
+    submitFormData.append('productCategory', sanitizeInput(formData.category));
+    submitFormData.append(
+      'productDescription',
+      sanitizeInput(formData.description)
+    );
     if (formData.imageFile) {
       submitFormData.append('productImage', formData.imageFile);
     }
@@ -127,7 +140,6 @@ const AddGadgetPage = () => {
             <Grid
               container
               spacing={3}>
-              {/* Basic Information */}
               <Grid
                 item
                 xs={12}
@@ -138,7 +150,10 @@ const AddGadgetPage = () => {
                   fullWidth
                   value={formData.name}
                   onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
+                    setFormData({
+                      ...formData,
+                      name: sanitizeInput(e.target.value),
+                    })
                   }
                   error={!!errors.name}
                   helperText={errors.name}
@@ -163,7 +178,10 @@ const AddGadgetPage = () => {
                   type='number'
                   value={formData.price}
                   onChange={(e) =>
-                    setFormData({ ...formData, price: e.target.value })
+                    setFormData({
+                      ...formData,
+                      price: sanitizeInput(e.target.value),
+                    })
                   }
                   error={!!errors.price}
                   helperText={errors.price}
@@ -188,7 +206,10 @@ const AddGadgetPage = () => {
                   <Select
                     value={formData.category}
                     onChange={(e) =>
-                      setFormData({ ...formData, category: e.target.value })
+                      setFormData({
+                        ...formData,
+                        category: sanitizeInput(e.target.value),
+                      })
                     }
                     label='Category'
                     startAdornment={
@@ -216,7 +237,7 @@ const AddGadgetPage = () => {
                   }}>
                   <input
                     type='file'
-                    accept='image/*'
+                    accept='image/png, image/jpeg, image/jpg'
                     id='image-upload'
                     style={{ display: 'none' }}
                     onChange={handleImageChange}
@@ -229,8 +250,7 @@ const AddGadgetPage = () => {
                       component='span'
                       startIcon={<CloudUpload />}
                       fullWidth
-                      sx={{ height: '56px' }} // Match height with other inputs
-                    >
+                      sx={{ height: '56px' }}>
                       {formData.imageFile ? 'Change Image' : 'Upload Image'}
                     </Button>
                   </label>
@@ -248,7 +268,10 @@ const AddGadgetPage = () => {
                   fullWidth
                   value={formData.description}
                   onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
+                    setFormData({
+                      ...formData,
+                      description: sanitizeInput(e.target.value),
+                    })
                   }
                   error={!!errors.description}
                   helperText={errors.description}
@@ -283,11 +306,7 @@ const AddGadgetPage = () => {
                     <img
                       src={previewUrl}
                       alt='Preview'
-                      style={{
-                        width: '100%',
-                        height: 'auto',
-                        display: 'block',
-                      }}
+                      style={{ width: '100%', height: 'auto' }}
                     />
                   </Paper>
                 </Grid>
@@ -296,20 +315,17 @@ const AddGadgetPage = () => {
               <Grid
                 item
                 xs={12}>
-                <Box
-                  sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                  <Button
-                    variant='contained'
-                    color='primary'
-                    type='submit'
-                    disabled={loading}
-                    startIcon={
-                      loading ? <CircularProgress size={20} /> : <Save />
-                    }
-                    size='large'>
-                    {loading ? 'Saving...' : 'Save Gadget'}
-                  </Button>
-                </Box>
+                <Button
+                  variant='contained'
+                  color='primary'
+                  type='submit'
+                  disabled={loading}
+                  startIcon={
+                    loading ? <CircularProgress size={20} /> : <Save />
+                  }
+                  size='large'>
+                  {loading ? 'Saving...' : 'Save Gadget'}
+                </Button>
               </Grid>
             </Grid>
           </form>
