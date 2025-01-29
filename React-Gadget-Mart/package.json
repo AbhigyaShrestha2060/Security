@@ -22,6 +22,7 @@
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.3",
     "chartjs-plugin-datalabels": "^2.2.0",
+    "dompurify": "^3.2.3",
     "framer-motion": "^11.3.19",
     "google-map-react": "^2.2.1",
     "https": "^1.0.0",

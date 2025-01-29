@@ -1,24 +1,35 @@
-// controllers/cartController.js
-const path = require('path');
 const Cart = require('../models/cartModel');
+const DOMPurify = require('dompurify');
+
+const sanitizeInput = (input) => DOMPurify.sanitize(input);
 
 exports.addToCart = async (req, res) => {
-  const { productId, quantity, total } = req.body;
+  let { productId, quantity, total } = req.body;
   const id = req.user.id;
 
-  if (!productId || !quantity || !total) {
-    return res.status(400).json({ message: 'Please enter all fields' });
+  productId = sanitizeInput(productId);
+  quantity = parseInt(sanitizeInput(quantity), 10);
+  total = parseFloat(sanitizeInput(total));
+
+  if (
+    !productId ||
+    isNaN(quantity) ||
+    quantity <= 0 ||
+    isNaN(total) ||
+    total <= 0
+  ) {
+    return res.status(400).json({ message: 'Invalid input data' });
   }
 
   try {
     const itemInCart = await Cart.findOne({
-      productId: productId,
+      productId,
       userId: id,
       status: 'active',
     });
 
     if (itemInCart) {
-      itemInCart.quantity += parseInt(quantity, 10);
+      itemInCart.quantity += quantity;
       itemInCart.total = itemInCart.quantity * (total / quantity);
       await itemInCart.save();
       return res
@@ -26,13 +37,7 @@ exports.addToCart = async (req, res) => {
         .json({ message: 'Item quantity updated', cartItem: itemInCart });
     }
 
-    const cartItem = new Cart({
-      productId: productId,
-      quantity: parseInt(quantity, 10),
-      total: total,
-      userId: id,
-    });
-
+    const cartItem = new Cart({ productId, quantity, total, userId: id });
     await cartItem.save();
     res.status(200).json({ message: 'Item added to cart', cartItem });
   } catch (error) {
@@ -40,11 +45,9 @@ exports.addToCart = async (req, res) => {
   }
 };
 
-// Get all cart items
 exports.getAllCartItems = async (req, res) => {
   const id = req.user.id;
   try {
-    //  join cart with products
     const cartItems = await Cart.find({
       userId: id,
       status: 'active',
@@ -57,7 +60,6 @@ exports.getAllCartItems = async (req, res) => {
   }
 };
 
-// Delete item from cart
 exports.deleteCartItem = async (req, res) => {
   try {
     const { id } = req.params;
@@ -68,29 +70,21 @@ exports.deleteCartItem = async (req, res) => {
   }
 };
 
-// Update cart item endpoint
 exports.updateCartItem = async (req, res) => {
   try {
-    const { id } = req.params; // Extract id from URL params
-    let { quantity, total } = req.body; // Extract quantity from request body
+    const { id } = req.params;
+    let { quantity, total } = req.body;
 
-    // Convert quantity to a number if it's provided as a string
-    quantity = Number(quantity);
-    // Validate quantity here if needed
-    if (isNaN(quantity) || quantity <= 0) {
-      return res
-        .status(400)
-        .json({ error: 'Quantity must be a valid number greater than zero' });
+    quantity = parseInt(sanitizeInput(quantity), 10);
+    total = parseFloat(sanitizeInput(total));
+
+    if (isNaN(quantity) || quantity <= 0 || isNaN(total) || total <= 0) {
+      return res.status(400).json({ error: 'Invalid quantity or total' });
     }
 
-    // Update the cart item based on id
     await Cart.findByIdAndUpdate(id, { quantity, total });
-
-    // Respond with success message
     res.status(200).json({ message: 'Item updated successfully' });
   } catch (error) {
-    // Handle errors
-    console.error('Error updating cart item:', error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -100,10 +94,13 @@ exports.updateUserCartStatus = async (req, res) => {
     const id = req.user.id;
     const { status } = req.body;
 
-    const cartItems = await Cart.updateMany({ userId: id }, { status: status });
-    res
-      .status(200)
-      .json({ message: 'Cart status updated successfully', cartItems });
+    const validStatuses = ['active', 'completed', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: 'Invalid cart status' });
+    }
+
+    await Cart.updateMany({ userId: id }, { status });
+    res.status(200).json({ message: 'Cart status updated successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
