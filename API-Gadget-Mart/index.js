@@ -13,6 +13,7 @@ const xssClean = require('xss-clean');
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
+const { limiter } = require('./controllers/userController');
 
 // Load environment variables
 dotenv.config();
@@ -39,6 +40,9 @@ app.use(xssClean());
 
 // LogActivity
 app.use(logActivity.activityLoggerMiddleware);
+
+// Rate Limiter
+app.use(limiter);
 
 // Configure form data handling
 app.use(acceptFormdata());

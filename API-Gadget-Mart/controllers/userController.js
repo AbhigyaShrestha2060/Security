@@ -1,12 +1,17 @@
 const userModel = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const sendOtp = require('../service/sendOtp');
-const user = require('../models/userModel');
 const axios = require('axios');
-const { promisify } = require('util');
 const nodemailer = require('nodemailer');
 const speakeasy = require('speakeasy');
+const validator = require('validator');
+const rateLimit = require('express-rate-limit');
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+});
 
 const isPasswordValid = (password) => {
   const minLength = 8;
@@ -20,7 +25,6 @@ const isPasswordValid = (password) => {
   );
 };
 
-// Registering the user with reCAPTCHA verification
 const createUser = async (req, res) => {
   const { fullName, email, phone, password, captchaToken } = req.body;
 
@@ -30,17 +34,26 @@ const createUser = async (req, res) => {
       .json({ success: false, message: 'All fields are required!' });
   }
 
+  if (!validator.isEmail(email)) {
+    return res
+      .status(400)
+      .json({ success: false, message: 'Invalid email format!' });
+  }
+
+  if (!validator.isMobilePhone(phone, 'any')) {
+    return res
+      .status(400)
+      .json({ success: false, message: 'Invalid phone number!' });
+  }
+
   if (!isPasswordValid(password)) {
-    return res.status(400).json({
-      success: false,
-      message:
-        'Password must be 8-20 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.',
-    });
+    return res
+      .status(400)
+      .json({ success: false, message: 'Invalid password format!' });
   }
 
   try {
-    // Verify reCAPTCHA
-    const recaptchaSecret = '6LeqWbMqAAAAAFIAIzAa04QYfwzOGOP7ua6vBWSn';
+    const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY;
     const response = await axios.post(
       'https://www.google.com/recaptcha/api/siteverify',
       null,
@@ -55,7 +68,6 @@ const createUser = async (req, res) => {
         .json({ success: false, message: 'reCAPTCHA verification failed!' });
     }
 
-    // Check if the user already exists
     const existingUser = await userModel.findOne({ email });
     if (existingUser) {
       return res
@@ -63,33 +75,25 @@ const createUser = async (req, res) => {
         .json({ success: false, message: 'User already exists!' });
     }
 
-    // Hash the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create the new user
     const newUser = new userModel({
       fullname: fullName,
       email,
       phone,
       password: hashedPassword,
-      passwordHistory: [hashedPassword], // Store initial password in history
+      passwordHistory: [hashedPassword],
       passwordLastUpdated: Date.now(),
     });
 
     await newUser.save();
-
     res.status(201).json({ success: true, message: 'User created!' });
   } catch (error) {
     console.error('Error creating user:', error);
     res.status(500).json({ success: false, message: 'Internal server error!' });
   }
 };
-
-// Logging in the user with rate limiting and reCAPTCHA verification
-
-// For generating and validating OTPs
-
 // Login User Controller
 const loginUser = async (req, res) => {
   const { email, password, captchaToken } = req.body;
@@ -346,23 +350,19 @@ const resetPassword = async (req, res) => {
   const { otp, phoneNumber, password } = req.body;
 
   if (!otp || !phoneNumber || !password) {
-    return res.status(400).json({
-      success: false,
-      message: 'All fields are required.',
-    });
+    return res
+      .status(400)
+      .json({ success: false, message: 'All fields are required.' });
   }
 
   if (!isPasswordValid(password)) {
-    return res.status(400).json({
-      success: false,
-      message:
-        'Password must be 8-20 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.',
-    });
+    return res
+      .status(400)
+      .json({ success: false, message: 'Invalid password format!' });
   }
 
   try {
     const user = await userModel.findOne({ phone: phoneNumber });
-
     if (!user) {
       return res
         .status(404)
@@ -370,9 +370,7 @@ const resetPassword = async (req, res) => {
     }
 
     if (user.resetPasswordOTP !== parseInt(otp)) {
-      return res
-        .status(400)
-        .json({ success: false, message: 'OTP is incorrect.' });
+      return res.status(400).json({ success: false, message: 'Invalid OTP.' });
     }
 
     if (user.resetPasswordExpires < Date.now()) {
@@ -381,26 +379,19 @@ const resetPassword = async (req, res) => {
         .json({ success: false, message: 'OTP has expired.' });
     }
 
-    // Prevent password reuse
-    const isReused = user.passwordHistory.some(
-      async (oldPassword) => await bcrypt.compare(password, oldPassword)
-    );
-
-    if (isReused) {
-      return res.status(400).json({
-        success: false,
-        message: 'You cannot reuse any of your recent passwords.',
-      });
+    for (let oldPassword of user.passwordHistory) {
+      if (await bcrypt.compare(password, oldPassword)) {
+        return res
+          .status(400)
+          .json({ success: false, message: 'Password cannot be reused!' });
+      }
     }
 
-    // Update password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     user.password = hashedPassword;
     user.passwordHistory.push(hashedPassword);
-
-    // Keep only the last 5 passwords in history
     if (user.passwordHistory.length > 5) {
       user.passwordHistory.shift();
     }
@@ -410,7 +401,6 @@ const resetPassword = async (req, res) => {
     user.resetPasswordExpires = null;
 
     await user.save();
-
     res
       .status(200)
       .json({ success: true, message: 'Password reset successfully.' });
@@ -462,43 +452,47 @@ const getAllUser = async (req, res) => {
   }
 };
 
-// update profile
 const updateProfile = async (req, res) => {
   const id = req.user.id;
-  const { fullname, email, phone, password } = req.body;
+  const { fullname, email, phone } = req.body;
+
   if (!fullname || !email || !phone) {
-    return res.status(400).json({
-      success: false,
-      message: 'Please enter all fields',
-    });
+    return res
+      .status(400)
+      .json({ success: false, message: 'All fields are required!' });
   }
+
+  if (!validator.isEmail(email)) {
+    return res
+      .status(400)
+      .json({ success: false, message: 'Invalid email format!' });
+  }
+
+  if (!validator.isMobilePhone(phone, 'any')) {
+    return res
+      .status(400)
+      .json({ success: false, message: 'Invalid phone number!' });
+  }
+
   try {
     const user = await userModel.findById(id);
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found',
-      });
+      return res
+        .status(404)
+        .json({ success: false, message: 'User not found.' });
     }
+
     user.fullname = fullname;
     user.email = email;
     user.phone = phone;
-    user.password = password;
     await user.save();
-    res.status(200).json({
-      success: true,
-      message: 'Profile updated successfully',
-      user: {
-        fullname: user.fullname,
-        email: user.email,
-        phone: user.phone,
-      },
-    });
+
+    res
+      .status(200)
+      .json({ success: true, message: 'Profile updated successfully.', user });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-    });
+    console.error('Error updating profile:', error);
+    res.status(500).json({ success: false, message: 'Internal server error.' });
   }
 };
 
@@ -557,6 +551,7 @@ const enforcePasswordExpiry = async (req, res, next) => {
 };
 
 module.exports = {
+  limiter,
   createUser,
   loginUser,
   verifyOTP,
