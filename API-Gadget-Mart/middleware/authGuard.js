@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const { activityLoggerMiddleware } = require('./LogActivity');
-const authGuard = (req, res, next) => {
+const userModel = require('../models/userModel');
+
+const authGuard = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   // check or validate
@@ -26,7 +28,17 @@ const authGuard = (req, res, next) => {
   try {
     const decodeUserData = jwt.verify(token, 'SECRET');
     req.user = decodeUserData; //user info : id onlyf
-    
+
+    // verify user and req.user={id:user._id", email:user.email,  role:user.role}
+    const user = await userModel.findById(req.user.id);
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+    req.user = { id: user._id, email: user.email, role: user.role };
+
     next();
   } catch (error) {
     return res.status(400).json({
@@ -37,7 +49,7 @@ const authGuard = (req, res, next) => {
 };
 
 // Admin guard
-const adminGuard = (req, res, next) => {
+const adminGuard = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   // check or validate
@@ -69,8 +81,21 @@ const adminGuard = (req, res, next) => {
         message: 'Permission Denied',
       });
     }
+    const user = await userModel.findById(req.user.id);
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+    req.user = {
+      id: user._id,
+      email: user.email,
+      isAdmin: user.role === 'admin',
+    };
     next();
   } catch (error) {
+    console.log(error);
     return res.status(400).json({
       success: false,
       message: 'Not Authenticated',

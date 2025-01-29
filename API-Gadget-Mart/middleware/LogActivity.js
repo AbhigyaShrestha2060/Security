@@ -1,9 +1,7 @@
 const Log = require('../models/LogActivityModel');
 const activityLoggerMiddleware = async (req, res, next) => {
   const logEntry = new Log({
-    username: req.user
-      ? req.user.fullname || req.user.email || 'Unknown User'
-      : 'Unknown User',
+    username: req.user ? req.user.email || 'Unknown User' : 'Unknown User',
     url: req.originalUrl,
     method: req.method,
     role: req.user?.role || 'User', // Dynamically set role
