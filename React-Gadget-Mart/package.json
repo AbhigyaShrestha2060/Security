@@ -45,6 +45,7 @@
     "recharts": "^2.12.7",
     "redis": "^4.7.0",
     "secure": "^0.1.3",
+    "serve": "^14.2.4",
     "socket.io-client": "^4.7.5",
     "styled-components": "^6.1.12",
     "sweetalert2": "^11.12.3",
@@ -57,7 +58,7 @@
   "scripts": {
     "start": "set HTTPS=true&&set SSL_CRT_FILE=./root.crt&&set SSL_KEY_FILE=./root.key&&react-scripts start",
     "build": "set \"GENERATE_SOURCEMAP=false\" && react-scripts build",
-    "deploy": "serve -s build --listen 3000 --ssl-cert ./certificate/server.crt --ssl-key ./certificate/server.key",
+    "deploy": "serve -s build --listen 3000 --ssl-cert ./server.crt --ssl-key ./server.key",
     "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!axios)/\"",
     "eject": "react-scripts eject"
   },
