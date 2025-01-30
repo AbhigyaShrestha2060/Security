@@ -23,11 +23,21 @@ const app = express();
 
 // Configure CORS
 const corsOptions = {
-  origin: [process.env.FRONTEND_URL],
+  origin: (origin, callback) => {
+    const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true); // Allow the request
+    } else {
+      callback(new Error('Not allowed by CORS')); // Block the request
+    }
+  },
   credentials: true,
-  optionSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  optionsSuccessStatus: 200,
 };
+
 app.use(cors(corsOptions));
+
 app.use(morgan('tiny'));
 // Express JSON configuration
 app.use(express.json());
