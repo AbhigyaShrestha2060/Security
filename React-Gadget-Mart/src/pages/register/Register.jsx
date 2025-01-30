@@ -29,6 +29,7 @@ const COLORS = {
   darkGrey: '#64748b',
   inputBg: '#1a1a2e',
   borderColor: '#334155',
+  success: '#22c55e',
 };
 
 const BackgroundContainer = styled.div`
@@ -119,6 +120,60 @@ const StyledInput = styled(animated.div)`
   }
 `;
 
+const PasswordStrengthContainer = styled.div`
+  margin: -0.8rem 0 1.2rem;
+  padding: 0 0.5rem;
+`;
+
+const StrengthMeter = styled.div`
+  display: flex;
+  gap: 4px;
+  height: 4px;
+  margin: 8px 0;
+`;
+
+const MeterSegment = styled.div`
+  flex: 1;
+  height: 100%;
+  border-radius: 2px;
+  transition: background-color 0.3s ease;
+`;
+
+const RequirementsList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+  font-size: 0.8rem;
+  color: ${COLORS.darkGrey};
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 4px 0;
+
+    &.met {
+      color: ${COLORS.success};
+    }
+  }
+`;
+
+const StrengthText = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+
+  .strength-label {
+    font-weight: 500;
+  }
+
+  .strength-score {
+    color: ${COLORS.darkGrey};
+    font-size: 0.75rem;
+  }
+`;
+
 const PasswordToggle = styled.button`
   position: absolute;
   right: 1rem;
@@ -184,26 +239,6 @@ const GoogleButton = styled(StyledButton)`
   }
 `;
 
-const TermsCheckbox = styled.div`
-  display: flex;
-  align-items: center;
-  margin: 1rem 0;
-  font-size: 0.9rem;
-  color: ${COLORS.text};
-
-  input[type='checkbox'] {
-    margin-right: 0.5rem;
-    width: 16px;
-    height: 16px;
-    accent-color: ${COLORS.secondary};
-  }
-
-  label {
-    cursor: pointer;
-    user-select: none;
-  }
-`;
-
 const LoginLink = styled.div`
   text-align: center;
   margin-top: 1.5rem;
@@ -222,6 +257,98 @@ const LoginLink = styled.div`
   }
 `;
 
+const PasswordStrength = ({ password }) => {
+  const calculateStrength = (pwd) => {
+    if (!pwd) return { score: 0, text: '', color: COLORS.darkGrey };
+
+    let score = 0;
+    const requirements = {
+      length: pwd.length >= 8,
+      uppercase: /[A-Z]/.test(pwd),
+      lowercase: /[a-z]/.test(pwd),
+      numbers: /[0-9]/.test(pwd),
+      special: /[^A-Za-z0-9]/.test(pwd),
+    };
+
+    // Score based on requirements
+    if (requirements.length) score++;
+    if (pwd.length >= 12) score++;
+    if (requirements.uppercase) score++;
+    if (requirements.lowercase) score++;
+    if (requirements.numbers) score++;
+    if (requirements.special) score++;
+
+    // Map score to strength levels
+    const strengthMap = {
+      0: { text: 'Too Weak', color: COLORS.error },
+      1: { text: 'Weak', color: COLORS.error },
+      2: { text: 'Fair', color: COLORS.warning },
+      3: { text: 'Good', color: COLORS.warning },
+      4: { text: 'Strong', color: COLORS.success },
+      5: { text: 'Very Strong', color: COLORS.success },
+      6: { text: 'Excellent', color: COLORS.success },
+    };
+
+    return {
+      score,
+      requirements,
+      ...strengthMap[score],
+    };
+  };
+
+  const strength = calculateStrength(password);
+  const segments = 6;
+
+  return (
+    <PasswordStrengthContainer>
+      <StrengthText>
+        <span
+          className='strength-label'
+          style={{ color: password ? strength.color : COLORS.darkGrey }}>
+          {password ? strength.text : 'Password Strength'}
+        </span>
+        {password && (
+          <span className='strength-score'>
+            Score: {strength.score}/{segments}
+          </span>
+        )}
+      </StrengthText>
+
+      <StrengthMeter>
+        {[...Array(segments)].map((_, index) => (
+          <MeterSegment
+            key={index}
+            style={{
+              backgroundColor:
+                index < strength.score ? strength.color : COLORS.grey,
+            }}
+          />
+        ))}
+      </StrengthMeter>
+
+      {password && (
+        <RequirementsList>
+          <li className={strength.requirements.length ? 'met' : ''}>
+            • Minimum 8 characters
+          </li>
+          <li className={strength.requirements.uppercase ? 'met' : ''}>
+            • At least one uppercase letter
+          </li>
+          <li className={strength.requirements.lowercase ? 'met' : ''}>
+            • At least one lowercase letter
+          </li>
+          <li className={strength.requirements.numbers ? 'met' : ''}>
+            • At least one number
+          </li>
+          <li className={strength.requirements.special ? 'met' : ''}>
+            • At least one special character
+          </li>
+        </RequirementsList>
+      )}
+    </PasswordStrengthContainer>
+  );
+};
+
 const Register = () => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -229,7 +356,6 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [agreeTerms, setAgreeTerms] = useState(false);
   const [captchaToken, setCaptchaToken] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -244,11 +370,6 @@ const Register = () => {
 
     if (password !== confirmPassword) {
       toast.error('Passwords do not match');
-      return;
-    }
-
-    if (!agreeTerms) {
-      toast.error('Please agree to the Terms of Service and Privacy Policy');
       return;
     }
 
@@ -269,7 +390,6 @@ const Register = () => {
 
       if (response.status === 201) {
         toast.success('Registration successful! Please login to continue.');
-        // Redirect to login page after short delay
         setTimeout(() => {
           window.location.href = '/login';
         }, 2000);
@@ -340,6 +460,9 @@ const Register = () => {
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </PasswordToggle>
           </StyledInput>
+
+          <PasswordStrength password={password} />
+
           <StyledInput style={inputSpring}>
             <FaLock />
             <input
@@ -351,19 +474,6 @@ const Register = () => {
               disabled={loading}
             />
           </StyledInput>
-
-          <TermsCheckbox>
-            <input
-              type='checkbox'
-              id='terms'
-              checked={agreeTerms}
-              onChange={(e) => setAgreeTerms(e.target.checked)}
-              disabled={loading}
-            />
-            <label htmlFor='terms'>
-              I agree to the Terms of Service and Privacy Policy
-            </label>
-          </TermsCheckbox>
 
           <div style={{ margin: '1rem 0' }}>
             <ReCAPTCHA
