@@ -101,9 +101,6 @@ const adminGuard = async (req, res, next) => {
       message: 'Not Authenticated',
     });
   }
-
-  // if verified : next (function in controller)
-  // if not verified : not auth
 };
 
 module.exports = {
