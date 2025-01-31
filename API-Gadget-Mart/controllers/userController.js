@@ -312,6 +312,7 @@ const verifyOTP = async (req, res) => {
 // forgot password by using phone number
 const forgetPassword = async (req, res) => {
   const { phoneNumber } = req.body;
+  console.log(phoneNumber);
 
   if (!phoneNumber) {
     return res.status(400).json({
@@ -348,6 +349,7 @@ const forgetPassword = async (req, res) => {
 
 const resetPassword = async (req, res) => {
   const { otp, phoneNumber, password } = req.body;
+  console.log(otp, phoneNumber, password);
 
   if (!otp || !phoneNumber || !password) {
     return res

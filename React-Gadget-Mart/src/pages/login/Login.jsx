@@ -29,12 +29,16 @@ import { alpha } from '@mui/material/styles';
 import React, { useEffect, useState } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { useNavigate } from 'react-router-dom';
-import { loginUserApi, verifyMfaCodeApi } from '../../Apis/api';
+import {
+  forgotPasswordApi,
+  loginUserApi,
+  resetPasswordApi,
+  verifyMfaCodeApi,
+} from '../../Apis/api';
 
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_DURATION = 15 * 60 * 1000;
 
-// Custom styled components
 const StyledContainer = styled(Container)(({ theme }) => ({
   minHeight: '100vh',
   display: 'flex',
@@ -92,6 +96,13 @@ const Login = () => {
   const [lockoutEndTime, setLockoutEndTime] = useState(null);
   const [userId, setUserId] = useState(null);
   const [isOtpModalVisible, setIsOtpModalVisible] = useState(false);
+  const [isResetModalVisible, setIsResetModalVisible] = useState(false);
+  const [resetPhoneNumber, setResetPhoneNumber] = useState('');
+  const [resetOtp, setResetOtp] = useState('');
+  const [showResetOtpField, setShowResetOtpField] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -194,6 +205,59 @@ const Login = () => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    try {
+      setLoading(true);
+      setError('');
+
+      const response = await forgotPasswordApi({
+        phoneNumber: resetPhoneNumber,
+      });
+
+      if (response.status === 200) {
+        setShowResetOtpField(true);
+      } else {
+        throw new Error(response.data.message || 'Failed to send OTP');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to send OTP');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      setError('');
+
+      const response = await resetPasswordApi({
+        phoneNumber: resetPhoneNumber,
+        otp: resetOtp,
+        password: newPassword,
+      });
+
+      if (response.status === 200) {
+        setResetSuccess(true);
+        setTimeout(() => {
+          setIsResetModalVisible(false);
+          setResetSuccess(false);
+          setResetPhoneNumber('');
+          setResetOtp('');
+          setNewPassword('');
+          setShowResetOtpField(false);
+        }, 3000);
+      } else {
+        throw new Error(response.data.message || 'Password reset failed');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to reset password');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <StyledContainer>
       <StyledPaper elevation={24}>
@@ -291,6 +355,17 @@ const Login = () => {
               }}
             />
 
+            <Box
+              sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+              <Button
+                variant='text'
+                size='small'
+                onClick={() => setIsResetModalVisible(true)}
+                sx={{ textTransform: 'none' }}>
+                Forgot Password?
+              </Button>
+            </Box>
+
             <Box sx={{ display: 'flex', justifyContent: 'center', my: 3 }}>
               <ReCAPTCHA
                 sitekey='6LeqWbMqAAAAAJsPdQqXcEX6M-68zQNUex8sYCgA'
@@ -360,6 +435,124 @@ const Login = () => {
             variant='contained'>
             Verify OTP
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={isResetModalVisible}
+        onClose={() => {
+          setIsResetModalVisible(false);
+          setResetSuccess(false);
+          setResetPhoneNumber('');
+          setResetOtp('');
+          setNewPassword('');
+          setShowResetOtpField(false);
+          setError('');
+        }}
+        maxWidth='xs'
+        fullWidth>
+        <DialogTitle>Reset Password</DialogTitle>
+        <DialogContent>
+          {resetSuccess ? (
+            <Alert
+              severity='success'
+              sx={{ mt: 2 }}>
+              Password reset successfully
+            </Alert>
+          ) : (
+            <>
+              <Typography
+                variant='body2'
+                color='text.secondary'
+                sx={{ mt: 2 }}>
+                {!showResetOtpField
+                  ? 'Enter your phone number to receive an OTP'
+                  : 'Enter the OTP and your new password'}
+              </Typography>
+
+              {!showResetOtpField ? (
+                <TextField
+                  fullWidth
+                  label='Phone Number'
+                  variant='outlined'
+                  margin='normal'
+                  value={resetPhoneNumber}
+                  onChange={(e) => setResetPhoneNumber(e.target.value)}
+                />
+              ) : (
+                <>
+                  <TextField
+                    fullWidth
+                    label='OTP'
+                    variant='outlined'
+                    margin='normal'
+                    value={resetOtp}
+                    onChange={(e) => setResetOtp(e.target.value)}
+                    inputProps={{ maxLength: 6 }}
+                  />
+                  <TextField
+                    fullWidth
+                    label='New Password'
+                    variant='outlined'
+                    margin='normal'
+                    type={showNewPassword ? 'text' : 'password'}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position='end'>
+                          <IconButton
+                            onClick={() => setShowNewPassword(!showNewPassword)}
+                            edge='end'>
+                            {showNewPassword ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </>
+              )}
+              {error && (
+                <Alert
+                  severity='error'
+                  sx={{ mt: 2 }}>
+                  {error}
+                </Alert>
+              )}
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setIsResetModalVisible(false);
+              setResetSuccess(false);
+              setResetPhoneNumber('');
+              setResetOtp('');
+              setNewPassword('');
+              setShowResetOtpField(false);
+              setError('');
+            }}>
+            Cancel
+          </Button>
+          {!resetSuccess && (
+            <Button
+              onClick={
+                !showResetOtpField ? handleForgotPassword : handleResetPassword
+              }
+              variant='contained'
+              disabled={
+                !showResetOtpField
+                  ? !resetPhoneNumber
+                  : !resetOtp || !newPassword
+              }>
+              {!showResetOtpField ? 'Get OTP' : 'Reset Password'}
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
     </StyledContainer>
