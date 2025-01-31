@@ -68,11 +68,6 @@ app.get('/test', (req, res) => {
   res.send('Test API is Working!...');
 });
 
-const options = {
-  key: fs.readFileSync(path.resolve(__dirname, 'server.key')),
-  cert: fs.readFileSync(path.resolve(__dirname, 'server.crt')),
-};
-
 // Define routes
 // Use cartRoutes for /api/cart endpoints
 app.use('/api/cart', cartRoutes);
@@ -85,6 +80,11 @@ app.use('/api/user', require('./routes/userRoutes'));
 app.use('/api/product', require('./routes/productRoutes'));
 app.use('/api/order', require('./routes/orderRoutes'));
 app.use('/api/logactivity', require('./routes/LogActivityRoutes'));
+
+const options = {
+  key: fs.readFileSync(path.resolve(__dirname, 'server.key')),
+  cert: fs.readFileSync(path.resolve(__dirname, 'server.crt')),
+};
 // Define port
 const PORT = process.env.PORT;
 

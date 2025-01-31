@@ -141,7 +141,7 @@ const loginUser = async (req, res) => {
   };
 
   if (
-    currentAttempts.count >= 5 &&
+    currentAttempts.count >= 2 &&
     currentAttempts.timestamp &&
     Date.now() - currentAttempts.timestamp < 60 * 1000
   ) {
