@@ -526,7 +526,7 @@ const Homepage = () => {
             hoverable
             cover={
               <Image
-                src={`http://localhost:5000/products/${gadget.productImage}`}
+                src={`https://localhost:5000/products/${gadget.productImage}`}
                 alt={gadget.productName}
                 preview={false}
                 onClick={() => showProductDetails(gadget)}
@@ -595,7 +595,7 @@ const Homepage = () => {
           <ListViewItem>
             <div className='list-image-container'>
               <Image
-                src={`http://localhost:5000/products/${gadget.productImage}`}
+                src={`https://localhost:5000/products/${gadget.productImage}`}
                 alt={gadget.productName}
                 preview={false}
                 onClick={() => showProductDetails(gadget)}
@@ -674,7 +674,7 @@ const Homepage = () => {
             </CarouselItem>
             <CarouselItem>
               <img
-                src='https://img.freepik.com/free-photo/close-up-games-with-joystick_23-2148514527.jpg'
+                src='http://img.freepik.com/free-photo/close-up-games-with-joystick_23-2148514527.jpg'
                 alt='Gaming Accessories'
               />
               <div className='carousel-content'>

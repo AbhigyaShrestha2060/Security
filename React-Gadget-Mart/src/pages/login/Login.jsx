@@ -180,7 +180,9 @@ const Login = () => {
         localStorage.setItem('user', JSON.stringify(response.data.user));
         setIsOtpModalVisible(false);
         navigate(
-          response.data.user.role === 'admin' ? '/admin/dashboard' : '/'
+          response.data.user.role === 'admin'
+            ? '/admin/dashboard'
+            : '/userdashboard'
         );
       } else {
         throw new Error(response.data.message || 'Invalid OTP');

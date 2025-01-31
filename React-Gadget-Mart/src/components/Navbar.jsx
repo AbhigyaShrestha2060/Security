@@ -229,7 +229,7 @@ const Navbar = () => {
             <StyledNavLink to='/about'>About Us</StyledNavLink>
           </NavItem>
           <NavItem variants={itemVariants}>
-            <StyledNavLink to='/contact'>Contact Us</StyledNavLink>
+            <StyledNavLink to='/cart'>Cart</StyledNavLink>
           </NavItem>
         </NavLinks>
         <UserActions>

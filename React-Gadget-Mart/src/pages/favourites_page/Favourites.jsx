@@ -117,10 +117,10 @@ const Favourites = () => {
               transition={{ duration: 0.5, delay: index * 0.1 }}>
               <Image
                 width={150}
-                src={`http://localhost:5000/products/${item.productId.productImage}`}
+                src={`https://localhost:5000/products/${item.productId.productImage}`}
                 alt={item.productName}
                 preview={{
-                  src: `http://localhost:5000/products/${item.productId.productImage}`,
+                  src: `https://localhost:5000/products/${item.productId.productImage}`,
                 }}
               />
               <ItemDetails>

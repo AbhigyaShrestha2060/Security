@@ -1,15 +1,25 @@
 const Cart = require('../models/cartModel');
-const DOMPurify = require('dompurify');
+const createDOMPurify = require('dompurify');
+const { JSDOM } = require('jsdom');
 
-const sanitizeInput = (input) => DOMPurify.sanitize(input);
+const window = new JSDOM('').window;
+const DOMPurify = createDOMPurify(window);
+
+// Sanitize input for strings only
+const sanitizeInput = (input) => {
+  if (typeof input === 'string') {
+    return DOMPurify.sanitize(input);
+  }
+  return input;
+};
 
 exports.addToCart = async (req, res) => {
   let { productId, quantity, total } = req.body;
   const id = req.user.id;
 
   productId = sanitizeInput(productId);
-  quantity = parseInt(sanitizeInput(quantity), 10);
-  total = parseFloat(sanitizeInput(total));
+  quantity = parseInt(quantity, 10);
+  total = parseFloat(total);
 
   if (
     !productId ||
@@ -75,8 +85,8 @@ exports.updateCartItem = async (req, res) => {
     const { id } = req.params;
     let { quantity, total } = req.body;
 
-    quantity = parseInt(sanitizeInput(quantity), 10);
-    total = parseFloat(sanitizeInput(total));
+    quantity = parseInt(quantity, 10);
+    total = parseFloat(total);
 
     if (isNaN(quantity) || quantity <= 0 || isNaN(total) || total <= 0) {
       return res.status(400).json({ error: 'Invalid quantity or total' });

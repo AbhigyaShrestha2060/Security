@@ -118,7 +118,7 @@ const ProductCard = ({ productInformation, viewMode, addToCart, cartItem }) => {
   const cardContent = (
     <>
       <ProductImage
-        src={`http://localhost:5000/products/${productInformation.productImage}`}
+        src={`https://localhost:5000/products/${productInformation.productImage}`}
         alt={productInformation.productName}
         preview={false}
         onClick={handleShow}
@@ -163,7 +163,7 @@ const ProductCard = ({ productInformation, viewMode, addToCart, cartItem }) => {
         <Card style={{ width: '100%', marginBottom: '16px' }}>
           <div style={{ display: 'flex' }}>
             <ListViewProductImage
-              src={`http://localhost:5000/products/${productInformation.productImage}`}
+              src={`https://localhost:5000/products/${productInformation.productImage}`}
               alt={productInformation.productName}
               preview={false}
               onClick={handleShow}
@@ -216,7 +216,7 @@ const ProductCard = ({ productInformation, viewMode, addToCart, cartItem }) => {
           </Button>,
         ]}>
         <Image
-          src={`http://localhost:5000/products/${productInformation.productImage}`}
+          src={`https://localhost:5000/products/${productInformation.productImage}`}
           alt={productInformation.productName}
           style={{ width: '100%', marginBottom: '16px' }}
         />
@@ -243,7 +243,7 @@ const ProductCard = ({ productInformation, viewMode, addToCart, cartItem }) => {
         ]}>
         <div style={{ display: 'flex', marginBottom: '16px' }}>
           <Image
-            src={`http://localhost:5000/products/${productInformation.productImage}`}
+            src={`https://localhost:5000/products/${productInformation.productImage}`}
             alt={productInformation.productName}
             style={{ width: '100px', height: '100px', marginRight: '16px' }}
           />
